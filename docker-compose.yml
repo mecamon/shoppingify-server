@@ -1,0 +1,32 @@
+version: '3.7'
+services:
+  database:
+    container_name: postgres_db
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_NAME}
+    expose:
+      - 5432
+    ports:
+      - "5432:5432"
+  migrations:
+    container_name: migrations_runner
+    build: ./migrations
+    depends_on:
+      - database
+    volumes:
+      - ./migrations:/migrations
+    entrypoint: ["./wait-for-it.sh", "database:5432", "--", "migrate", "-path", "/migrations", "-database",  "postgres://${DB_USER}:${DB_PASSWORD}@database:5432/${DB_NAME}?sslmode=disable", "up"]
+  web:
+    container_name: web_rest_application
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    depends_on:
+      - database
+      - migrations
+    ports:
+      - "8080:8080"
+    entrypoint: ["./wait-for-it.sh", "database:5432", "--", "./bin/shop-app", "-db-user=${DB_USER}", "-db-password=${DB_PASSWORD}", "-db-name=${DB_NAME}"]
