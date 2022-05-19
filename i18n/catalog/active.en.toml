@@ -1,0 +1,14 @@
+[InvalidEmail]
+description = "Error message for invalid email address"
+one = "invalid email address"
+other = "invalid email address"
+
+[InvalidPassword]
+description = "Error message for invalid password"
+one = "password must contain at least one of this a-z, A-Z 0-9 and be longer than 8 characters"
+other = "password must contain at least one of this a-z, A-Z 0-9 and be longer than 8 characters"
+
+[invalidUsername]
+description = "Error message for invalid username"
+one = "username must be at least 4 characters long"
+other = "username must be at least 4 characters long"

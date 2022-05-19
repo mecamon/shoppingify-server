@@ -1,37 +1,36 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"net/http"
-
 	"github.com/mecamon/shoppingify-server/config"
 	"github.com/mecamon/shoppingify-server/db"
+	"log"
+	"net/http"
 )
 
 func main() {
-	log.Println("It is working...")
+	run()
+}
+
+func run() {
 	config.Set()
 	conf := config.Get()
 
-	db, err := db.InitDB(conf)
+	database, err := db.InitDB(conf)
 	if err != nil {
 		panic(err.Error())
 	}
-	defer db.Close()
+	defer database.Close()
 
-	err = db.Ping()
+	err = database.Ping()
 	if err != nil {
 		panic(err.Error())
 	}
 	log.Println("DB pinged!!!")
 
-	http.HandleFunc("/home", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Welcome!")
-	})
+	router := makeRouter()
 
-	err = http.ListenAndServe(":8080", nil)
+	err = http.ListenAndServe(":8080", router)
 	if err != nil {
-		log.Fatal("ListenAndServe: ", err)
+		log.Fatal("Could not start server", router)
 	}
 }

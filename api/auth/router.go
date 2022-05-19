@@ -1,0 +1,13 @@
+package auth
+
+import (
+	"github.com/go-chi/chi/v5"
+	"net/http"
+)
+
+func Routes() http.Handler {
+	authRouter := chi.NewRouter()
+	authRouter.Post("/register", handler.Register)
+
+	return authRouter
+}
