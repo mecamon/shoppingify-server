@@ -8,7 +8,11 @@ import (
 	"log"
 )
 
-func GetLocales(lang string) *i18n.Localizer {
+type AppLocales struct {
+	Localizer *i18n.Localizer
+}
+
+func GetLocales(lang string) AppLocales {
 	var enPath string
 	var bundle *i18n.Bundle
 
@@ -35,5 +39,10 @@ func GetLocales(lang string) *i18n.Localizer {
 		}
 	}
 
-	return i18n.NewLocalizer(bundle, lang)
+	return AppLocales{i18n.NewLocalizer(bundle, lang)}
+}
+
+func (a *AppLocales) GetMsg(messageId string) string {
+	msg := a.Localizer.MustLocalize(&i18n.LocalizeConfig{MessageID: messageId})
+	return msg
 }
