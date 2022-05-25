@@ -8,7 +8,17 @@ description = "Error message for invalid password"
 one = "password must contain at least one of this a-z, A-Z 0-9 and be longer than 8 characters"
 other = "password must contain at least one of this a-z, A-Z 0-9 and be longer than 8 characters"
 
-[invalidUsername]
-description = "Error message for invalid username"
-one = "username must be at least 4 characters long"
-other = "username must be at least 4 characters long"
+[TooShortField]
+description = "Error message for too short field"
+one = "{{.Label}} must be at least {{.Count}} characters long"
+other = "{{.Label}} must be at least {{.Count}} characters long"
+
+[EmailAddressTaken]
+description = "Error message for email already in use"
+one = "the email inserted is already in use"
+other = "the email inserted is already in use"
+
+[InvalidEmailOrPassword]
+description = "Error message for bad credentials login"
+one = "wrong email or password"
+other = "wrong email or password"

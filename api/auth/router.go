@@ -8,6 +8,7 @@ import (
 func Routes() http.Handler {
 	authRouter := chi.NewRouter()
 	authRouter.Post("/register", handler.Register)
+	authRouter.Post("/login", handler.Login)
 
 	return authRouter
 }

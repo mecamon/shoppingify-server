@@ -42,7 +42,10 @@ func GetLocales(lang string) AppLocales {
 	return AppLocales{i18n.NewLocalizer(bundle, lang)}
 }
 
-func (a *AppLocales) GetMsg(messageId string) string {
-	msg := a.Localizer.MustLocalize(&i18n.LocalizeConfig{MessageID: messageId})
+func (a *AppLocales) GetMsg(messageId string, tempData map[string]interface{}) string {
+	msg := a.Localizer.MustLocalize(&i18n.LocalizeConfig{
+		MessageID:    messageId,
+		TemplateData: tempData,
+	})
 	return msg
 }

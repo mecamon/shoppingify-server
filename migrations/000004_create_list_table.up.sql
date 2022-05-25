@@ -4,8 +4,8 @@ CREATE TABLE lists(
     is_completed bool,
     is_cancelled bool,
     user_id int,
-    created_at timestamp,
-    updated_at timestamp,
+    created_at bigint,
+    updated_at bigint,
     completed_at timestamp,
     CONSTRAINT fk_user
         FOREIGN KEY(user_id)

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/mecamon/shoppingify-server/api/repositories"
 	"github.com/mecamon/shoppingify-server/config"
 	"github.com/mecamon/shoppingify-server/db"
 	"log"
@@ -15,17 +16,19 @@ func run() {
 	config.Set()
 	conf := config.Get()
 
-	database, err := db.InitDB(conf)
+	conn, err := db.InitDB(conf)
 	if err != nil {
 		panic(err.Error())
 	}
-	defer database.Close()
+	defer conn.Close()
 
-	err = database.Ping()
+	err = conn.Ping()
 	if err != nil {
 		panic(err.Error())
 	}
 	log.Println("DB pinged!!!")
+
+	repositories.InitRepos(conn, conf)
 
 	router := makeRouter()
 

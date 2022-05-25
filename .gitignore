@@ -2,3 +2,4 @@ app
 .env
 coverage.out
 run.sh
+logs.txt

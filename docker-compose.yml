@@ -27,6 +27,8 @@ services:
     depends_on:
       - database
       - migrations
+    volumes:
+      - ./logs.txt:/usr/src/app/logs.txt
     ports:
       - "8080:8080"
-    entrypoint: ["./wait-for-it.sh", "database:5432", "--", "./bin/shop-app", "-db-user=${DB_USER}", "-db-password=${DB_PASSWORD}", "-db-name=${DB_NAME}"]
+    entrypoint: ["./wait-for-it.sh", "database:5432", "--", "./bin/shop-app", "-db-host=${DB_HOST}" , "-db-user=${DB_USER}", "-db-password=${DB_PASSWORD}", "-db-name=${DB_NAME}"]

@@ -1,0 +1,1 @@
+DROP INDEX users.idx_email
