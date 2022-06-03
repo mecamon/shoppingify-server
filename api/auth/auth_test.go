@@ -42,7 +42,6 @@ func TestValidCredentials(t *testing.T) {
 }
 
 func TestCompleteUserInformation(t *testing.T) {
-	t.Log("test complete user information")
 	user := models.User{
 		Name:     "Charles",
 		Lastname: "Maze",
@@ -61,6 +60,20 @@ func TestCompleteUserInformation(t *testing.T) {
 		t.Error("LoginCode prop is empty")
 	}
 	if completedUser.CreatedAt == 0 || completedUser.UpdatedAt == 0 {
+		t.Error("CreatedAt and/or UpdatedAt unset")
+	}
+}
+
+func TestCreateVisitorInformation(t *testing.T) {
+	visitor := createVisitorInformation()
+
+	if !visitor.IsVisitor {
+		t.Error("IsVisitor is false")
+	}
+	if visitor.LoginCode == "" {
+		t.Error("LoginCode prop is empty")
+	}
+	if visitor.CreatedAt == 0 || visitor.UpdatedAt == 0 {
 		t.Error("CreatedAt and/or UpdatedAt unset")
 	}
 }

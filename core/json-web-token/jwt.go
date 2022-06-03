@@ -10,7 +10,7 @@ import (
 
 var hmacSampleSecret = make([]byte, 32)
 
-func Generate(ID int, email string) (string, error) {
+func Generate(ID int64, email string) (string, error) {
 	issuedAt := &jwt.NumericDate{Time: time.Now()}
 	expiresAt := &jwt.NumericDate{Time: time.Now().Add(24 * time.Hour)}
 

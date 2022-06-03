@@ -22,3 +22,37 @@ other = "the email inserted is already in use"
 description = "Error message for bad credentials login"
 one = "wrong email or password"
 other = "wrong email or password"
+
+[InvalidItemName]
+description = "Error message for item name longer than allowed"
+one = "item name cannot be longer than {{.Limit}}"
+other = "item name cannot be longer than {{.Limit}}"
+
+[InvalidItemNote]
+description = "Error message for item note longer than allowed"
+one = "item note cannot be longer than {{.Limit}}"
+other = "item note cannot be longer than {{.Limit}}"
+
+[CategoryMandatory]
+description = "Error message for item category required"
+other = "item category is required"
+
+[WrongFileType]
+description = "Error message for wrong file type"
+other = "file type has to be {{.Types}}"
+
+[FileTooBig]
+description = "Error message for files too big"
+other = "file cannot be bigger than {{.MaxSize}}"
+
+[CategoryNameError]
+description = "Error message for category name"
+other = "category name is required"
+
+[UserIDRequired]
+description = "Error for missing user_id"
+other = "user_id is required"
+
+[WrongQueryType]
+description = "Error for wrong query type"
+other = "{{.QueryParam}} type has to be {{.ExpectedType}}"

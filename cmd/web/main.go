@@ -21,13 +21,7 @@ func run() {
 		panic(err.Error())
 	}
 	defer conn.Close()
-
-	err = conn.Ping()
-	if err != nil {
-		panic(err.Error())
-	}
-	log.Println("DB pinged!!!")
-
+	
 	repositories.InitRepos(conn, conf)
 
 	router := makeRouter()

@@ -1,7 +1,4 @@
-//go:build !integration
-// +build !integration
-
-package auth
+package items
 
 import (
 	"net/http"
@@ -13,6 +10,6 @@ func TestRoutes(t *testing.T) {
 	i = Routes()
 
 	if _, ok := i.(http.Handler); !ok {
-		t.Error("incorrect handler type")
+		t.Error("error checking Routes() return type")
 	}
 }

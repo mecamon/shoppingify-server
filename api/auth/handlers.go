@@ -8,6 +8,7 @@ import (
 	appi18n "github.com/mecamon/shoppingify-server/i18n"
 	"github.com/mecamon/shoppingify-server/models"
 	"github.com/mecamon/shoppingify-server/utils"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -43,8 +44,9 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 		panic(w)
 	}
 
-	err = h.repos.AuthRepoImpl.Register(completedUser)
+	id, err := h.repos.AuthRepoImpl.Register(completedUser)
 	if err != nil {
+		log.Println(err.Error())
 		h.app.Loggers.Info.Println(err.Error())
 		if strings.Contains(err.Error(), "unique constraint") {
 			errMsg := locales.GetMsg("EmailAddressTaken", nil)
@@ -57,7 +59,7 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	token, err := json_web_token.Generate(user.ID, user.Email)
+	token, err := json_web_token.Generate(id, user.Email)
 	if err != nil {
 		h.app.Loggers.Info.Println(err.Error())
 		panic(w)
@@ -105,4 +107,22 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	tokenMap := map[string]string{"token": token}
 	output, _ := json.MarshalIndent(tokenMap, "", "    ")
 	utils.Response(w, http.StatusOK, output)
+}
+
+func (h *Handler) VisitorRegister(w http.ResponseWriter, r *http.Request) {
+	visitor := createVisitorInformation()
+	id, err := h.repos.AuthRepoImpl.Register(visitor)
+	if err != nil {
+		h.app.Loggers.Error.Println(err.Error())
+		panic(w)
+	}
+
+	token, err := json_web_token.Generate(id, "")
+	if err != nil {
+		h.app.Loggers.Error.Println(err.Error())
+		panic(w)
+	}
+	tokenMap := map[string]string{"token": token}
+	output, _ := json.MarshalIndent(tokenMap, "", "    ")
+	utils.Response(w, http.StatusCreated, output)
 }

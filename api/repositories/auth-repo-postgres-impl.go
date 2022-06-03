@@ -16,7 +16,8 @@ func initAuthRepo(conn *sql.DB, app *config.App) AuthRepo {
 	return &AuthRepoPostgres{Conn: conn, App: app}
 }
 
-func (r *AuthRepoPostgres) Register(user models.User) error {
+func (r *AuthRepoPostgres) Register(user models.User) (int64, error) {
+	var ID int64
 	query := `INSERT INTO users (
        name, 
 	   lastname, 
@@ -27,8 +28,8 @@ func (r *AuthRepoPostgres) Register(user models.User) error {
 	   login_code, 
 	   created_at, 
 	   updated_at
-	   ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
-	_, err := r.Conn.Exec(
+	   ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING ID`
+	err := r.Conn.QueryRow(
 		query, user.Name,
 		user.Lastname,
 		user.Email,
@@ -37,11 +38,11 @@ func (r *AuthRepoPostgres) Register(user models.User) error {
 		user.IsVisitor,
 		user.LoginCode,
 		user.CreatedAt,
-		user.UpdatedAt)
+		user.UpdatedAt).Scan(&ID)
 	if err != nil {
-		return err
+		return 0, err
 	}
-	return nil
+	return ID, nil
 }
 
 func (r *AuthRepoPostgres) SearchUserByEmail(email string) (models.User, error) {

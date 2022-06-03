@@ -45,6 +45,7 @@ func setup() *sql.DB {
 	r := chi.NewRouter()
 	r.Post("/api/auth/register", authHandler.Register)
 	r.Post("/api/auth/login", authHandler.Login)
+	r.Post("/api/auth/visitor-register", authHandler.VisitorRegister)
 	Router = r
 	return conn
 }

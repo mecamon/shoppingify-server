@@ -9,6 +9,6 @@ func Routes() http.Handler {
 	authRouter := chi.NewRouter()
 	authRouter.Post("/register", handler.Register)
 	authRouter.Post("/login", handler.Login)
-
+	authRouter.Post("/visitor-register", handler.VisitorRegister)
 	return authRouter
 }

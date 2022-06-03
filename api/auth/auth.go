@@ -51,3 +51,12 @@ func completeUserInformation(user models.User) (models.User, error) {
 	}
 	return completedUser, nil
 }
+
+func createVisitorInformation() models.User {
+	return models.User{
+		IsVisitor: true,
+		LoginCode: uuid.NewString(),
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
+	}
+}
