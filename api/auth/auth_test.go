@@ -70,6 +70,9 @@ func TestCreateVisitorInformation(t *testing.T) {
 	if !visitor.IsVisitor {
 		t.Error("IsVisitor is false")
 	}
+	if !visitor.IsActive {
+		t.Error("IsVisitor is inactive")
+	}
 	if visitor.LoginCode == "" {
 		t.Error("LoginCode prop is empty")
 	}

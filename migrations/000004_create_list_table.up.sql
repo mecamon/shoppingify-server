@@ -6,7 +6,7 @@ CREATE TABLE lists(
     user_id int,
     created_at bigint,
     updated_at bigint,
-    completed_at timestamp,
+    completed_at bigint,
     CONSTRAINT fk_user
         FOREIGN KEY(user_id)
             REFERENCES users(id)

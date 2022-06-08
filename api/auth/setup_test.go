@@ -51,8 +51,6 @@ func setup() *sql.DB {
 }
 
 func shutdown(conn *sql.DB) {
-	stmt := "DELETE FROM users"
-	conn.Exec(stmt)
 	conn.Close()
 }
 

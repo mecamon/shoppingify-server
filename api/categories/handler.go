@@ -2,6 +2,7 @@ package categories
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/mecamon/shoppingify-server/api/repositories"
 	"github.com/mecamon/shoppingify-server/config"
 	appi18n "github.com/mecamon/shoppingify-server/i18n"
@@ -68,6 +69,38 @@ func (h *Handler) GetAllByName(w http.ResponseWriter, r *http.Request) {
 		h.App.Loggers.Error.Println(err.Error())
 		panic(w)
 	}
+	count, err := h.Repos.CategoriesRepoImpl.Count(q)
+	if err != nil {
+		h.App.Loggers.Error.Println(err.Error())
+	}
+
 	output, _ := json.MarshalIndent(categories, "", "    ")
-	utils.Response(w, http.StatusOK, output)
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("X-Total-Count", fmt.Sprintf("%d", count))
+	w.WriteHeader(http.StatusOK)
+	w.Write(output)
+}
+
+func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request) {
+	takeQuery := r.URL.Query().Get("take")
+	take, _ := utils.QueryConvertInt(takeQuery, 12)
+
+	skipQuery := r.URL.Query().Get("skip")
+	skip, _ := utils.QueryConvertInt(skipQuery, 0)
+
+	categories, err := h.Repos.CategoriesRepoImpl.GetAll(take, skip)
+	if err != nil {
+		h.App.Loggers.Error.Println(err.Error())
+		panic(w)
+	}
+	count, err := h.Repos.CategoriesRepoImpl.Count()
+	if err != nil {
+		h.App.Loggers.Error.Println(err.Error())
+	}
+
+	output, _ := json.Marshal(categories)
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("X-Total-Count", fmt.Sprintf("%d", count))
+	w.WriteHeader(http.StatusOK)
+	w.Write(output)
 }

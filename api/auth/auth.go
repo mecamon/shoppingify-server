@@ -55,6 +55,7 @@ func completeUserInformation(user models.User) (models.User, error) {
 func createVisitorInformation() models.User {
 	return models.User{
 		IsVisitor: true,
+		IsActive:  true,
 		LoginCode: uuid.NewString(),
 		CreatedAt: time.Now().Unix(),
 		UpdatedAt: time.Now().Unix(),

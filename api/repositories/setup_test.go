@@ -1,5 +1,7 @@
 package repositories
 
+// TODO add integration build tag
+
 import (
 	"database/sql"
 	"github.com/mecamon/shoppingify-server/config"
@@ -9,9 +11,13 @@ import (
 	"testing"
 )
 
-var authRepo AuthRepo
-var categoriesRepo CategoriesRepo
-var conn *sql.DB
+var (
+	authRepo       AuthRepo
+	categoriesRepo CategoriesRepo
+	itemsRepo      ItemsRepo
+	listsRepo      ListsRepo
+	conn           *sql.DB
+)
 
 func TestMain(m *testing.M) {
 	setup()
@@ -26,6 +32,8 @@ func setup() {
 	conn, _ = db.InitDB(conf)
 	authRepo = initAuthRepo(conn, conf)
 	categoriesRepo = initCategoriesRepo(conn, conf)
+	itemsRepo = initItemsRepo(conn, conf)
+	listsRepo = initListsRepo(conn, conf)
 }
 
 func shutdown() {

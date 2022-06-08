@@ -8,3 +8,4 @@
 - [golang-jwt](https://github.com/golang-jwt/jwt)
 - [golang-crypto-bcrypt](https://pkg.go.dev/golang.org/x/crypto/bcrypt)
 - [pgx](https://github.com/jackc/pgx)
+- [Cloudinary](https://cloudinary.com/documentation/go_integration)

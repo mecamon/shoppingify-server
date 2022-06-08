@@ -3,6 +3,7 @@ services:
   database:
     container_name: postgres_db
     image: postgres
+    restart: always
     environment:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_USER: ${DB_USER}
@@ -31,4 +32,4 @@ services:
       - ./logs.txt:/usr/src/app/logs.txt
     ports:
       - "8080:8080"
-    entrypoint: ["./wait-for-it.sh", "database:5432", "--", "./bin/shop-app", "-db-host=${DB_HOST}" , "-db-user=${DB_USER}", "-db-password=${DB_PASSWORD}", "-db-name=${DB_NAME}"]
+    entrypoint: ["./wait-for-it.sh", "database:5432", "--", "./bin/shop-app", "-db-host=${DB_HOST}" , "-db-user=${DB_USER}", "-db-password=${DB_PASSWORD}", "-db-name=${DB_NAME}", "-storage-cloud-name=${STORAGE_CLOUD_NAME}", "-storage-api-key=${STORAGE_API_KEY}", "-storage-api-secret=${STORAGE_API_SECRET}", "-storage-api-env-var=${STORAGE_API_ENV_VAR}"]

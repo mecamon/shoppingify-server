@@ -2,6 +2,7 @@ CREATE TABLE items_selected(
     id SERIAL PRIMARY KEY,
     item_id int,
     quantity int,
+    is_completed bool,
     list_id int,
     created_at bigint,
     updated_at bigint,

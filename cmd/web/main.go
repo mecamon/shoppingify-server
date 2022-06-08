@@ -4,6 +4,7 @@ import (
 	"github.com/mecamon/shoppingify-server/api/repositories"
 	"github.com/mecamon/shoppingify-server/config"
 	"github.com/mecamon/shoppingify-server/db"
+	"github.com/mecamon/shoppingify-server/services/storage"
 	"log"
 	"net/http"
 )
@@ -21,8 +22,12 @@ func run() {
 		panic(err.Error())
 	}
 	defer conn.Close()
-	
+
 	repositories.InitRepos(conn, conf)
+	_, err = storage.InitStorage()
+	if err != nil {
+		conf.Loggers.Error.Println(err.Error())
+	}
 
 	router := makeRouter()
 

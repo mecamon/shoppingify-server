@@ -10,6 +10,7 @@ import (
 	"github.com/mecamon/shoppingify-server/models"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -52,7 +53,7 @@ func TestHandler_GetAllByName(t *testing.T) {
 	q := "ea"
 
 	rr := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/api/categories/?q="+q, nil)
+	req := httptest.NewRequest(http.MethodGet, "/api/categories/by-name?q="+q, nil)
 	req.Header.Set("Authorization", userToken)
 
 	Router.ServeHTTP(rr, req)
@@ -71,5 +72,24 @@ func TestHandler_GetAllByName(t *testing.T) {
 			t.Error("categories do not contain the query searched")
 			break
 		}
+	}
+}
+
+func TestHandler_GetAll(t *testing.T) {
+	rr := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, "/api/categories/", nil)
+	req.Header.Set("Authorization", userToken)
+
+	Router.ServeHTTP(rr, req)
+	if rr.Code != http.StatusOK {
+		t.Errorf("got %d when expected was %d", rr.Code, http.StatusOK)
+	}
+	value := rr.Result().Header.Get("X-Total-Count")
+	count, err := strconv.ParseInt(value, 10, 64)
+	if err != nil {
+		t.Error(err.Error())
+	}
+	if count == 0 {
+		t.Error("expected more than 0 from X-Total-Count header but got 0")
 	}
 }

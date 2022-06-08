@@ -42,7 +42,8 @@ func setup() *sql.DB {
 	r := chi.NewRouter()
 	r.Use(middlewares.TokenValidation)
 	r.Post("/api/categories/", categoriesHandler.Create)
-	r.Get("/api/categories/", categoriesHandler.GetAllByName)
+	r.Get("/api/categories/", categoriesHandler.GetAll)
+	r.Get("/api/categories/by-name", categoriesHandler.GetAllByName)
 	Router = r
 
 	seedingData() //Seeding data for the handlers tests
