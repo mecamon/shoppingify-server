@@ -1,3 +1,6 @@
+//go:build integration
+// +build integration
+
 package repositories
 
 import (
@@ -8,8 +11,6 @@ import (
 	"time"
 )
 
-//TODO add the build integration tag
-
 var (
 	userIDForListRepo      int64
 	insertedListID         int64
@@ -17,7 +18,7 @@ var (
 	userForListRepo        models.User
 )
 
-func TestListsRepoPostgres_Create(t *testing.T) {
+func TestListsRepoPostgres_Create_Success(t *testing.T) {
 	var err error
 	userForListRepo = models.User{
 		Name:      "User test List repo",
@@ -56,8 +57,7 @@ func TestListsRepoPostgres_Create(t *testing.T) {
 	}
 }
 
-func TestListsRepoPostgres_GetActive(t *testing.T) {
-
+func TestListsRepoPostgres_GetActive_Success(t *testing.T) {
 	listDTO, err := listsRepo.GetActive()
 	if err != nil {
 		t.Error(err.Error())
@@ -67,8 +67,56 @@ func TestListsRepoPostgres_GetActive(t *testing.T) {
 	}
 }
 
-func TestListsRepoPostgres_AddItemToList(t *testing.T) {
+func TestListsRepoPostgres_GetActive_Error1(t *testing.T) {
+	//Cancelling the previously created list
+	err := listsRepo.CancelActive()
+	if err != nil {
+		t.Error(err.Error())
+	}
+	_, err = listsRepo.GetActive()
+	t.Log(err.Error())
+	if err == nil {
+		t.Error(err.Error())
+	}
+}
+
+func TestListsRepoPostgres_AddItemToList_Error1(t *testing.T) {
 	var err error
+	itemSelected := models.SelectedItem{
+		ItemID:      0,
+		Quantity:    3,
+		IsCompleted: false,
+		ListID:      insertedListID, //Cancelled at TestListsRepoPostgres_GetActive_Error1
+		CreatedAt:   time.Now().Unix(),
+		UpdatedAt:   time.Now().Unix(),
+	}
+	insertedItemSelectedID, err = listsRepo.AddItemToList(itemSelected)
+	if err == nil {
+		t.Error("expected an error but did not get it")
+	}
+	if err.Error() != "cannot add item to inactive list" {
+		t.Error("got the wrong error message")
+	}
+}
+
+func TestListsRepoPostgres_AddItemToList_Success(t *testing.T) {
+	var err error
+
+	//Creating the cancelled list
+	list := models.List{
+		Name:        "Test list 2",
+		IsCompleted: false,
+		IsCancelled: false,
+		UserID:      userIDForListRepo,
+		CreatedAt:   time.Now().Unix(),
+		UpdatedAt:   time.Now().Unix(),
+		CompletedAt: 0,
+	}
+	insertedListID, err = listsRepo.Create(list)
+	if err != nil {
+		t.Error(err.Error())
+	}
+
 	category := models.Category{
 		Name:      "Category for listsRepo",
 		UserID:    userIDForListRepo,
@@ -117,28 +165,75 @@ func TestListsRepoPostgres_IsListActive(t *testing.T) {
 	}
 }
 
-func TestListsRepoPostgres_CompleteItemSelected(t *testing.T) {
+func TestListsRepoPostgres_CompleteItemSelected_Error(t *testing.T) {
+	var wrongItemSelectedId int64 = 500
+	err := listsRepo.CompleteItemSelected(wrongItemSelectedId)
+	if err == nil {
+		t.Error("expected an error but did not get it")
+	}
+	if err.Error() != "item does not exist" {
+		t.Error("wrong error message")
+	}
+}
+
+func TestListsRepoPostgres_CompleteItemSelected_Success(t *testing.T) {
 	err := listsRepo.CompleteItemSelected(insertedItemSelectedID)
 	if err != nil {
 		t.Error(err.Error())
 	}
 }
 
-func TestListsRepoPostgres_DeleteItemFromList(t *testing.T) {
-	err := listsRepo.DeleteItemFromList(insertedListID)
+func TestListsRepoPostgres_DeleteItemFromList_Error(t *testing.T) {
+	var wrongItemSelectedId int64 = 500
+	err := listsRepo.DeleteItemFromList(wrongItemSelectedId)
+	if err == nil {
+		t.Error("expected an error but did not get it")
+	}
+	if err.Error() != "item does not exist" {
+		t.Error("wrong error message")
+	}
+}
+
+func TestListsRepoPostgres_DeleteItemFromList_Success(t *testing.T) {
+	err := listsRepo.DeleteItemFromList(insertedItemSelectedID)
 	if err != nil {
 		t.Error(err.Error())
 	}
 }
 
-func TestListsRepoPostgres_CompleteActive(t *testing.T) {
-	err := listsRepo.CompleteActive()
+func TestListsRepoPostgres_CompleteActive_Error(t *testing.T) {
+	err := listsRepo.CancelActive()
+	if err != nil {
+		t.Error(err.Error())
+	}
+	err = listsRepo.CompleteActive()
+	if err == nil {
+		t.Error("expected an error but did not get it")
+	}
+}
+
+func TestListsRepoPostgres_CompleteActive_Success(t *testing.T) {
+	list := models.List{
+		Name:        "Test list 2",
+		IsCompleted: false,
+		IsCancelled: false,
+		UserID:      userIDForListRepo,
+		CreatedAt:   time.Now().Unix(),
+		UpdatedAt:   time.Now().Unix(),
+		CompletedAt: 0,
+	}
+	_, err := listsRepo.Create(list)
+	if err != nil {
+		t.Error(err.Error())
+	}
+
+	err = listsRepo.CompleteActive()
 	if err != nil {
 		t.Error(err.Error())
 	}
 }
 
-func TestListsRepoPostgres_CancelActive(t *testing.T) {
+func TestListsRepoPostgres_CancelActive_Success(t *testing.T) {
 	list := models.List{
 		Name:        "Test list 2",
 		IsCompleted: false,
@@ -155,5 +250,12 @@ func TestListsRepoPostgres_CancelActive(t *testing.T) {
 	err = listsRepo.CancelActive()
 	if err != nil {
 		t.Error(err.Error())
+	}
+}
+
+func TestListsRepoPostgres_CancelActive_Error(t *testing.T) {
+	err := listsRepo.CancelActive()
+	if err == nil {
+		t.Error("expected an error but did not get it")
 	}
 }

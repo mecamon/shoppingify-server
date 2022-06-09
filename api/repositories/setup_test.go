@@ -1,6 +1,7 @@
-package repositories
+//go:build integration
+// +build integration
 
-// TODO add integration build tag
+package repositories
 
 import (
 	"database/sql"

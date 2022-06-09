@@ -187,9 +187,16 @@ func (r *ListsRepoPostgres) DeleteItemFromList(itemSelID int64) error {
 	defer cancel()
 
 	stmt := `DELETE FROM items_selected AS i_sel WHERE i_sel.id=$1`
-	_, err := r.Conn.ExecContext(ctx, stmt, itemSelID)
+	result, err := r.Conn.ExecContext(ctx, stmt, itemSelID)
 	if err != nil {
 		return err
+	}
+	numberOfRows, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if numberOfRows == 0 {
+		return errors.New("item does not exist")
 	}
 	return nil
 }
