@@ -6,6 +6,7 @@ import (
 	"github.com/mecamon/shoppingify-server/api/auth"
 	"github.com/mecamon/shoppingify-server/api/categories"
 	"github.com/mecamon/shoppingify-server/api/items"
+	"github.com/mecamon/shoppingify-server/api/lists"
 	"github.com/mecamon/shoppingify-server/config"
 	"net/http"
 )
@@ -29,6 +30,8 @@ func makeRouter() http.Handler {
 	r.Mount("/api/items", items.Routes())
 	categories.InitHandler(appConfig)
 	r.Mount("/api/categories", categories.Routes())
-	
+	lists.InitHandler(appConfig)
+	r.Mount("/api/lists", lists.Routes())
+
 	return r
 }

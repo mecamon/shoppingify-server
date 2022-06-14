@@ -82,6 +82,11 @@ type SelectedItem struct {
 	UpdatedAt   int64 `json:"updated_at"`
 }
 
+type UpdateSelItemDTO struct {
+	ItemID   int64 `json:"item_id"`
+	Quantity int   `json:"quantity"`
+}
+
 type SelectedItemDTO struct {
 	ID       int64  `json:"id"`
 	ItemID   int64  `json:"item_id"`

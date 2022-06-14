@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/mecamon/shoppingify-server/config"
 	"github.com/mecamon/shoppingify-server/models"
 	"time"
@@ -54,7 +55,26 @@ func (r *ListsRepoPostgres) Create(list models.List) (int64, error) {
 	return insertedID, nil
 }
 
-func (r *ListsRepoPostgres) GetActive() (models.ListDTO, error) {
+func (r *ListsRepoPostgres) UpdateActiveListName(userID int64, name string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `UPDATE lists SET name=$1, updated_at=$2 WHERE lists.user_id=$3 AND lists.is_completed=false AND lists.is_cancelled=false`
+	result, err := r.Conn.ExecContext(ctx, stmt, name, time.Now().Unix(), userID)
+	if err != nil {
+		return err
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return errors.New("there is no active list")
+	}
+	return nil
+}
+
+func (r *ListsRepoPostgres) GetActive(userID int64) (models.ListDTO, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -69,8 +89,8 @@ func (r *ListsRepoPostgres) GetActive() (models.ListDTO, error) {
 	}
 	defer tx.Rollback()
 
-	query1 := `SELECT l.id, l.name, l.created_at FROM lists AS l WHERE l.is_completed=false AND l.is_cancelled=false`
-	row := tx.QueryRowContext(ctx, query1)
+	query1 := `SELECT l.id, l.name, l.created_at FROM lists AS l WHERE l.user_id=$1 AND l.is_completed=false AND l.is_cancelled=false`
+	row := tx.QueryRowContext(ctx, query1, userID)
 	err = row.Scan(&listID, &listName, &listCreatedAt)
 	if err != nil {
 		return list, err
@@ -220,12 +240,12 @@ func (r *ListsRepoPostgres) CompleteItemSelected(itemSelID int64) error {
 	return nil
 }
 
-func (r *ListsRepoPostgres) CancelActive() error {
+func (r *ListsRepoPostgres) CancelActive(userID int64) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	stmt := `UPDATE lists SET is_cancelled=true WHERE is_completed=false AND is_cancelled=false`
-	result, err := r.Conn.ExecContext(ctx, stmt)
+	stmt := `UPDATE lists SET is_cancelled=true WHERE user_id=$1 AND is_completed=false AND is_cancelled=false`
+	result, err := r.Conn.ExecContext(ctx, stmt, userID)
 	if err != nil {
 		return err
 	}
@@ -239,12 +259,12 @@ func (r *ListsRepoPostgres) CancelActive() error {
 	return nil
 }
 
-func (r *ListsRepoPostgres) CompleteActive() error {
+func (r *ListsRepoPostgres) CompleteActive(userID int64) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	stmt := `UPDATE lists SET is_completed=true WHERE is_completed=false AND is_cancelled=false`
-	result, err := r.Conn.ExecContext(ctx, stmt)
+	stmt := `UPDATE lists SET is_completed=true WHERE user_id=$1 AND is_completed=false AND is_cancelled=false`
+	result, err := r.Conn.ExecContext(ctx, stmt, userID)
 	if err != nil {
 		return err
 	}
@@ -254,6 +274,36 @@ func (r *ListsRepoPostgres) CompleteActive() error {
 	}
 	if numberOfRows == 0 {
 		return errors.New("there is no active list")
+	}
+	return nil
+}
+
+func (r *ListsRepoPostgres) UpdateItemsSelected(items []models.UpdateSelItemDTO) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	tx, err := r.Conn.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	for _, i := range items {
+		stmt := `UPDATE items_selected AS i_sel SET quantity=$1 WHERE i_sel.id=$2`
+		result, err := tx.ExecContext(ctx, stmt, i.Quantity, i.ItemID)
+		if err != nil {
+			return err
+		}
+		rowsAffected, err := result.RowsAffected()
+		if err != nil {
+			return err
+		}
+		if rowsAffected == 0 {
+			return errors.New(fmt.Sprintf("%d 404", i.ItemID))
+		}
+	}
+	if err = tx.Commit(); err != nil {
+		return err
 	}
 	return nil
 }

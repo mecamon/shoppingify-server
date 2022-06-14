@@ -57,8 +57,42 @@ func TestListsRepoPostgres_Create_Success(t *testing.T) {
 	}
 }
 
+func TestListsRepoPostgres_UpdateActiveListName_Success(t *testing.T) {
+	err := listsRepo.UpdateActiveListName(userIDForListRepo, "new list name")
+	if err != nil {
+		t.Error(err.Error())
+	}
+}
+
+func TestListsRepoPostgres_UpdateActiveListName_Error(t *testing.T) {
+	//Cancelling the active list to get an error in the upcoming step
+	err := listsRepo.CancelActive()
+	if err != nil {
+		t.Error(err.Error())
+	}
+	err = listsRepo.UpdateActiveListName(userIDForListRepo, "new list name")
+	if err == nil {
+		t.Error("expected and error but did not get it")
+	}
+}
+
 func TestListsRepoPostgres_GetActive_Success(t *testing.T) {
-	listDTO, err := listsRepo.GetActive()
+	var err error
+	//Creating the cancelled list
+	list := models.List{
+		Name:        "Test list 2",
+		IsCompleted: false,
+		IsCancelled: false,
+		UserID:      userIDForListRepo,
+		CreatedAt:   time.Now().Unix(),
+		UpdatedAt:   time.Now().Unix(),
+		CompletedAt: 0,
+	}
+	insertedListID, err = listsRepo.Create(list)
+	if err != nil {
+		t.Error(err.Error())
+	}
+	listDTO, err := listsRepo.GetActive(userIDForListRepo)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -73,7 +107,7 @@ func TestListsRepoPostgres_GetActive_Error1(t *testing.T) {
 	if err != nil {
 		t.Error(err.Error())
 	}
-	_, err = listsRepo.GetActive()
+	_, err = listsRepo.GetActive(userIDForListRepo)
 	t.Log(err.Error())
 	if err == nil {
 		t.Error(err.Error())
@@ -104,7 +138,7 @@ func TestListsRepoPostgres_AddItemToList_Success(t *testing.T) {
 
 	//Creating the cancelled list
 	list := models.List{
-		Name:        "Test list 2",
+		Name:        "Test list 3",
 		IsCompleted: false,
 		IsCancelled: false,
 		UserID:      userIDForListRepo,
@@ -150,6 +184,27 @@ func TestListsRepoPostgres_AddItemToList_Success(t *testing.T) {
 		UpdatedAt:   time.Now().Unix(),
 	}
 	insertedItemSelectedID, err = listsRepo.AddItemToList(itemSelected)
+	if err != nil {
+		t.Error(err.Error())
+	}
+}
+
+func TestListsRepoPostgres_UpdateItemsSelected_Error(t *testing.T) {
+	items := []models.UpdateSelItemDTO{
+		{ItemID: 877, Quantity: 4},
+		{ItemID: 837, Quantity: 2},
+	}
+	err := listsRepo.UpdateItemsSelected(items)
+	if err == nil {
+		t.Error("expected error but did not get it")
+	}
+}
+
+func TestListsRepoPostgres_UpdateItemsSelected_Success(t *testing.T) {
+	items := []models.UpdateSelItemDTO{
+		{ItemID: insertedItemSelectedID, Quantity: 8},
+	}
+	err := listsRepo.UpdateItemsSelected(items)
 	if err != nil {
 		t.Error(err.Error())
 	}

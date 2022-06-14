@@ -54,11 +54,13 @@ type ItemsRepo interface {
 
 type ListsRepo interface {
 	Create(list models.List) (int64, error)
-	GetActive() (models.ListDTO, error)
+	UpdateActiveListName(userID int64, name string) error
+	GetActive(userID int64) (models.ListDTO, error)
 	AddItemToList(item models.SelectedItem) (int64, error)
 	IsListActive(listID int64) (bool, error)
 	DeleteItemFromList(itemSelID int64) error
 	CompleteItemSelected(itemSelID int64) error
-	CancelActive() error
-	CompleteActive() error
+	UpdateItemsSelected(items []models.UpdateSelItemDTO) error
+	CancelActive(userID int64) error
+	CompleteActive(userID int64) error
 }

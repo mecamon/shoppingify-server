@@ -49,6 +49,10 @@ other = "file cannot be bigger than {{.MaxSize}}"
 description = "Error message for category name"
 other = "category name is required"
 
+[RequiredField]
+description = "Error message for required field"
+other = "{{.Field}} is required"
+
 [UserIDRequired]
 description = "Error for missing user_id"
 other = "user_id is required"
@@ -56,3 +60,19 @@ other = "user_id is required"
 [WrongQueryType]
 description = "Error for wrong query type"
 other = "{{.QueryParam}} type has to be {{.ExpectedType}}"
+
+[ThereIsAnActiveList]
+description = "Error for list already created"
+other = "there is already an active list"
+
+[DoesNotExist]
+description = "item does not exist"
+other = "{{.Item}} does not exist"
+
+[NoOperationsOnInactiveList]
+description = "No operations allowed in inactive lists"
+other = "cannot execute operations over inactive lists"
+
+[NoActiveList]
+description = "No active list display error"
+other = "no active list yet"
