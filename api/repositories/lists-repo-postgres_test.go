@@ -66,7 +66,7 @@ func TestListsRepoPostgres_UpdateActiveListName_Success(t *testing.T) {
 
 func TestListsRepoPostgres_UpdateActiveListName_Error(t *testing.T) {
 	//Cancelling the active list to get an error in the upcoming step
-	err := listsRepo.CancelActive()
+	err := listsRepo.CancelActive(userIDForListRepo)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -103,12 +103,11 @@ func TestListsRepoPostgres_GetActive_Success(t *testing.T) {
 
 func TestListsRepoPostgres_GetActive_Error1(t *testing.T) {
 	//Cancelling the previously created list
-	err := listsRepo.CancelActive()
+	err := listsRepo.CancelActive(userIDForListRepo)
 	if err != nil {
 		t.Error(err.Error())
 	}
 	_, err = listsRepo.GetActive(userIDForListRepo)
-	t.Log(err.Error())
 	if err == nil {
 		t.Error(err.Error())
 	}
@@ -257,11 +256,11 @@ func TestListsRepoPostgres_DeleteItemFromList_Success(t *testing.T) {
 }
 
 func TestListsRepoPostgres_CompleteActive_Error(t *testing.T) {
-	err := listsRepo.CancelActive()
+	err := listsRepo.CancelActive(userIDForListRepo)
 	if err != nil {
 		t.Error(err.Error())
 	}
-	err = listsRepo.CompleteActive()
+	err = listsRepo.CompleteActive(userIDForListRepo)
 	if err == nil {
 		t.Error("expected an error but did not get it")
 	}
@@ -282,7 +281,7 @@ func TestListsRepoPostgres_CompleteActive_Success(t *testing.T) {
 		t.Error(err.Error())
 	}
 
-	err = listsRepo.CompleteActive()
+	err = listsRepo.CompleteActive(userIDForListRepo)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -302,14 +301,14 @@ func TestListsRepoPostgres_CancelActive_Success(t *testing.T) {
 	if err != nil {
 		t.Error(err.Error())
 	}
-	err = listsRepo.CancelActive()
+	err = listsRepo.CancelActive(userIDForListRepo)
 	if err != nil {
 		t.Error(err.Error())
 	}
 }
 
 func TestListsRepoPostgres_CancelActive_Error(t *testing.T) {
-	err := listsRepo.CancelActive()
+	err := listsRepo.CancelActive(userIDForListRepo)
 	if err == nil {
 		t.Error("expected an error but did not get it")
 	}

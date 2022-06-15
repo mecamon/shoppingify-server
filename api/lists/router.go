@@ -13,7 +13,7 @@ func Routes() http.Handler {
 	listsRouter.Get("/active", handler.GetActive)
 	listsRouter.Patch("/name", handler.UpdateActiveListName)
 	listsRouter.Post("/add-item", handler.AddItemToList)
-	listsRouter.Put("/selected-items", handler.UpdateItemsSelected)
+	listsRouter.Patch("/update-items", handler.UpdateItemsSelected)
 	listsRouter.Delete("/selected-items", handler.DeleteItemFromList)
 	listsRouter.Put("/selected-items", handler.CompleteItemSelected)
 	listsRouter.Delete("/cancel-active", handler.CancelActive)

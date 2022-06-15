@@ -34,15 +34,16 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&body)
 	if err != nil {
 		h.app.Loggers.Error.Println(err.Error())
-		panic(w)
+		utils.Response(w, http.StatusNotAcceptable, nil)
+		return
 	}
 
-	_, err = h.repos.ListsRepoImpl.GetActive(userID)
-	if err != nil {
+	activeList, _ := h.repos.ListsRepoImpl.GetActive(userID)
+	if activeList.ID != 0 {
 		msg := locales.GetMsg("ThereIsAnActiveList", nil)
 		errMap := models.ErrorMap{"list": msg}
 		output, _ := json.Marshal(errMap)
-		utils.Response(w, http.StatusBadRequest, output)
+		utils.Response(w, http.StatusConflict, output)
 		return
 	}
 
@@ -93,7 +94,7 @@ func (h *Handler) UpdateActiveListName(w http.ResponseWriter, r *http.Request) {
 	locales := appi18n.GetLocales(lang)
 
 	body := struct {
-		name string `json:"name"`
+		Name string `json:"name"`
 	}{}
 	err := json.NewDecoder(r.Body).Decode(&body)
 	if err != nil {
@@ -102,7 +103,7 @@ func (h *Handler) UpdateActiveListName(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(body.name) == 0 {
+	if len(body.Name) == 0 {
 		td := map[string]interface{}{"Field": "list name"}
 		msg := locales.GetMsg("RequiredField", td)
 		errMap := models.ErrorMap{"name": msg}
@@ -111,7 +112,7 @@ func (h *Handler) UpdateActiveListName(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.repos.ListsRepoImpl.UpdateActiveListName(userID, body.name)
+	err = h.repos.ListsRepoImpl.UpdateActiveListName(userID, body.Name)
 	if err != nil {
 		h.app.Loggers.Error.Println(err.Error())
 		utils.Response(w, http.StatusInternalServerError, nil)
@@ -134,7 +135,7 @@ func (h *Handler) AddItemToList(w http.ResponseWriter, r *http.Request) {
 
 	dom := DomLists{
 		appLocales: locales,
-		itemToAdd:  models.SelectedItem{},
+		itemToAdd:  item,
 	}
 
 	isValid, errMap := dom.validateItemToAdd()
@@ -143,6 +144,7 @@ func (h *Handler) AddItemToList(w http.ResponseWriter, r *http.Request) {
 		utils.Response(w, http.StatusBadRequest, output)
 		return
 	}
+
 	completedItem := dom.completeItemToAdd()
 	insertedID, err := h.repos.ListsRepoImpl.AddItemToList(completedItem)
 	if err != nil {
@@ -152,8 +154,9 @@ func (h *Handler) AddItemToList(w http.ResponseWriter, r *http.Request) {
 			errMap := models.ErrorMap{"list": msg}
 			output, _ := json.Marshal(errMap)
 			utils.Response(w, http.StatusBadRequest, output)
-			return
 		}
+
+		return
 	}
 
 	res := map[string]interface{}{"insertedID": insertedID}
@@ -194,6 +197,7 @@ func (h *Handler) UpdateItemsSelected(w http.ResponseWriter, r *http.Request) {
 		utils.Response(w, http.StatusNotFound, output)
 		return
 	}
+	utils.Response(w, http.StatusOK, nil)
 }
 
 func (h *Handler) DeleteItemFromList(w http.ResponseWriter, r *http.Request) {
@@ -201,7 +205,7 @@ func (h *Handler) DeleteItemFromList(w http.ResponseWriter, r *http.Request) {
 	locales := appi18n.GetLocales(lang)
 
 	body := struct {
-		itemSelID int64 `json:"item_sel_id"`
+		ItemSelID int64 `json:"item_sel_id"`
 	}{}
 	err := json.NewDecoder(r.Body).Decode(&body)
 	if err != nil {
@@ -210,7 +214,7 @@ func (h *Handler) DeleteItemFromList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if body.itemSelID != 0 {
+	if body.ItemSelID == 0 {
 		td := map[string]interface{}{"Field": "item_sel_id"}
 		msg := locales.GetMsg("RequiredField", td)
 		errMap := models.ErrorMap{"idRequired": msg}
@@ -219,10 +223,10 @@ func (h *Handler) DeleteItemFromList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.repos.ListsRepoImpl.DeleteItemFromList(body.itemSelID)
+	err = h.repos.ListsRepoImpl.DeleteItemFromList(body.ItemSelID)
 	if err != nil {
 		h.app.Loggers.Info.Println(err.Error())
-		td := map[string]interface{}{"Item": body.itemSelID}
+		td := map[string]interface{}{"Item": body.ItemSelID}
 		msg := locales.GetMsg("DoesNotExist", td)
 		errMap := models.ErrorMap{"item": msg}
 		output, _ := json.Marshal(errMap)
@@ -237,7 +241,7 @@ func (h *Handler) CompleteItemSelected(w http.ResponseWriter, r *http.Request) {
 	locales := appi18n.GetLocales(lang)
 
 	body := struct {
-		itemSelID int64 `json:"item_sel_id"`
+		ItemSelID int64 `json:"item_sel_id"`
 	}{}
 	err := json.NewDecoder(r.Body).Decode(&body)
 	if err != nil {
@@ -246,7 +250,7 @@ func (h *Handler) CompleteItemSelected(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if body.itemSelID != 0 {
+	if body.ItemSelID == 0 {
 		td := map[string]interface{}{"Field": "item_sel_id"}
 		msg := locales.GetMsg("RequiredField", td)
 		errMap := models.ErrorMap{"idRequired": msg}
@@ -255,7 +259,7 @@ func (h *Handler) CompleteItemSelected(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.repos.ListsRepoImpl.CompleteItemSelected(body.itemSelID)
+	err = h.repos.ListsRepoImpl.CompleteItemSelected(body.ItemSelID)
 	if err != nil {
 		h.app.Loggers.Info.Println(err.Error())
 		td := map[string]interface{}{"Item": err.Error()}
@@ -279,7 +283,7 @@ func (h *Handler) CancelActive(w http.ResponseWriter, r *http.Request) {
 		msg := locales.GetMsg("NoActiveList", nil)
 		errMap := map[string]interface{}{"list": msg}
 		output, _ := json.Marshal(errMap)
-		utils.Response(w, http.StatusBadRequest, output)
+		utils.Response(w, http.StatusNotFound, output)
 		return
 	}
 	utils.Response(w, http.StatusOK, nil)
@@ -296,7 +300,7 @@ func (h *Handler) CompleteActive(w http.ResponseWriter, r *http.Request) {
 		msg := locales.GetMsg("NoActiveList", nil)
 		errMap := map[string]interface{}{"list": msg}
 		output, _ := json.Marshal(errMap)
-		utils.Response(w, http.StatusBadRequest, output)
+		utils.Response(w, http.StatusNotFound, output)
 		return
 	}
 	utils.Response(w, http.StatusOK, nil)

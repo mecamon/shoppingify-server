@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/mecamon/shoppingify-server/config"
 	"github.com/mecamon/shoppingify-server/models"
+	"strings"
 	"time"
 )
 
@@ -92,7 +93,7 @@ func (r *ListsRepoPostgres) GetActive(userID int64) (models.ListDTO, error) {
 	query1 := `SELECT l.id, l.name, l.created_at FROM lists AS l WHERE l.user_id=$1 AND l.is_completed=false AND l.is_cancelled=false`
 	row := tx.QueryRowContext(ctx, query1, userID)
 	err = row.Scan(&listID, &listName, &listCreatedAt)
-	if err != nil {
+	if err != nil && strings.Contains(err.Error(), "no rows in result set") {
 		return list, err
 	}
 
