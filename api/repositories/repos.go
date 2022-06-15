@@ -13,6 +13,8 @@ type MainRepo struct {
 	CategoriesRepoImpl CategoriesRepo
 	ItemsRepoIpml      ItemsRepo
 	ListsRepoImpl      ListsRepo
+	TopCategoriesImpl  TopCategoriesRepo
+	TopItemsImpl       TopItemsRepo
 }
 
 func InitRepos(conn *sql.DB, app *config.App) {
@@ -20,12 +22,16 @@ func InitRepos(conn *sql.DB, app *config.App) {
 	categoriesRepo := initCategoriesRepo(conn, app)
 	itemsRepo := initItemsRepo(conn, app)
 	listsRepo := initListsRepo(conn, app)
+	topCategories := initTopCategoriesRepo(conn, app)
+	topItemsRepo := initTopItemsRepo(conn, app)
 
 	Main = MainRepo{
 		AuthRepoImpl:       authRepo,
 		CategoriesRepoImpl: categoriesRepo,
 		ItemsRepoIpml:      itemsRepo,
 		ListsRepoImpl:      listsRepo,
+		TopCategoriesImpl:  topCategories,
+		TopItemsImpl:       topItemsRepo,
 	}
 }
 
@@ -63,4 +69,18 @@ type ListsRepo interface {
 	UpdateItemsSelected(items []models.UpdateSelItemDTO) error
 	CancelActive(userID int64) error
 	CompleteActive(userID int64) error
+}
+
+type TopCategoriesRepo interface {
+	Add(userID, categoryID int64) (int64, error)
+	Update(userID, categoryID int64) error
+	GetTop(userID int64, take int) ([]models.TopCategoryDTO, error)
+	GetAll(userID int64) ([]models.TopCategoryDTO, error)
+}
+
+type TopItemsRepo interface {
+	Add(userID, itemID int64) (int64, error)
+	Update(userID, itemID int64) error
+	GetTop(userID int64, take int) ([]models.TopItemDTO, error)
+	GetAll(userID int64) ([]models.TopItemDTO, error)
 }

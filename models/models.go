@@ -94,6 +94,36 @@ type SelectedItemDTO struct {
 	Quantity int    `json:"quantity"`
 }
 
+type TopCategory struct {
+	ID          int64 `json:"id"`
+	UserID      int64 `json:"user_id"`
+	CategoryID  int64 `json:"category_id"`
+	SumQuantity int   `json:"sum_quantity"`
+}
+
+type TopCategoryDTO struct {
+	ID          int64  `json:"id"`
+	CategoryID  int64  `json:"category_id"`
+	Name        string `json:"name"`
+	SumQuantity int    `json:"sum_quantity"`
+	Percentage  int    `json:"percentage"`
+}
+
+type TopItem struct {
+	ID          int64 `json:"id"`
+	UserID      int64 `json:"user_id"`
+	ItemID      int64 `json:"item_id"`
+	SumQuantity int   `json:"sum_quantity"`
+}
+
+type TopItemDTO struct {
+	ID          int64  `json:"id"`
+	ItemID      int64  `json:"item_id"`
+	Name        string `json:"name"`
+	SumQuantity int    `json:"sum_quantity"`
+	Percentage  int    `json:"percentage"`
+}
+
 type Auth struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
