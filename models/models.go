@@ -29,10 +29,11 @@ type Item struct {
 }
 
 type ItemDTO struct {
-	ID       int64  `json:"id"`
-	Name     string `json:"name"`
-	Note     string `json:"note"`
-	ImageURL string `json:"image_url"`
+	ID         int64  `json:"id"`
+	Name       string `json:"name"`
+	Note       string `json:"note"`
+	ImageURL   string `json:"image_url"`
+	CategoryID int64  `json:"category_id"`
 }
 
 type CategoriesGroup struct {

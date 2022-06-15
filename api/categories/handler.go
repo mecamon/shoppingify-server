@@ -50,6 +50,11 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 		h.App.Loggers.Error.Println(err.Error())
 		panic(w)
 	}
+	_, err = h.Repos.TopCategoriesImpl.Add(userId, ID)
+	if err != nil {
+		h.App.Loggers.Error.Println(err.Error())
+	}
+
 	res := map[string]interface{}{"InsertedID": ID}
 	output, _ := json.MarshalIndent(res, "", "    ")
 	utils.Response(w, http.StatusCreated, output)

@@ -87,8 +87,8 @@ func (i *ItemsRepoPostgres) GetByID(itemID int64) (models.ItemDTO, error) {
 
 	var item models.ItemDTO
 
-	stmt := `SELECT id, name, note, image_url FROM items WHERE items.id=$1`
-	err := i.Conn.QueryRowContext(ctx, stmt, itemID).Scan(&item.ID, &item.Name, &item.Note, &item.ImageURL)
+	stmt := `SELECT id, name, note, image_url, category_id FROM items WHERE items.id=$1`
+	err := i.Conn.QueryRowContext(ctx, stmt, itemID).Scan(&item.ID, &item.Name, &item.Note, &item.ImageURL, &item.CategoryID)
 	if err != nil {
 		return item, err
 	}

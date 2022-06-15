@@ -122,6 +122,7 @@ func (h *Handler) UpdateActiveListName(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) AddItemToList(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value("ID").(int64)
 	lang := r.Header.Get("Accept-Language")
 	locales := appi18n.GetLocales(lang)
 
@@ -157,6 +158,20 @@ func (h *Handler) AddItemToList(w http.ResponseWriter, r *http.Request) {
 		}
 
 		return
+	}
+
+	//Updating tops information
+	err = h.repos.TopItemsImpl.Update(userID, completedItem.ItemID)
+	if err != nil {
+		h.app.Loggers.Error.Println(err.Error())
+	}
+	itemInfo, err := h.repos.ItemsRepoIpml.GetByID(completedItem.ItemID)
+	if err != nil {
+		h.app.Loggers.Error.Println(err.Error())
+	}
+	err = h.repos.TopCategoriesImpl.Update(userID, itemInfo.CategoryID)
+	if err != nil {
+		h.app.Loggers.Error.Println(err.Error())
 	}
 
 	res := map[string]interface{}{"insertedID": insertedID}

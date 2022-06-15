@@ -30,7 +30,7 @@ func InitHandler(conf *config.App) *Handler {
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	lang := r.Header.Get("Accept-Language")
 	appLocales := appi18n.GetLocales(lang)
-	ID := r.Context().Value("ID")
+	userID := r.Context().Value("ID").(int64)
 
 	err := r.ParseMultipartForm(128)
 	if err != nil {
@@ -73,7 +73,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 			log.Println(err.Error()) //TODO REMOVE THIS
 		}
 
-		imageURL, err := storageService.UploadImage(file, fmt.Sprintf("%s-%d", itemDom.item.Name, ID))
+		imageURL, err := storageService.UploadImage(file, fmt.Sprintf("%s-%d", itemDom.item.Name, userID))
 		if err != nil {
 			h.app.Loggers.Error.Println(err.Error())
 		}
@@ -85,6 +85,11 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		h.app.Loggers.Error.Println(err.Error())
 		panic(w)
+	}
+
+	_, err = h.repos.TopItemsImpl.Add(userID, insertedID)
+	if err != nil {
+		h.app.Loggers.Error.Println(err.Error())
 	}
 
 	res := map[string]interface{}{"insertedID": insertedID}
