@@ -18,5 +18,7 @@ func Routes() http.Handler {
 	listsRouter.Put("/selected-items", handler.CompleteItemSelected)
 	listsRouter.Delete("/cancel-active", handler.CancelActive)
 	listsRouter.Patch("/complete-active", handler.CompleteActive)
+	listsRouter.Get("/old-lists", handler.GetOldLists)
+	listsRouter.Get("/{listId}", handler.GetByID)
 	return listsRouter
 }

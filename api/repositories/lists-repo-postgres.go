@@ -308,3 +308,104 @@ func (r *ListsRepoPostgres) UpdateItemsSelected(items []models.UpdateSelItemDTO)
 	}
 	return nil
 }
+
+func (r *ListsRepoPostgres) GetOldOnes(userID int64) ([]models.OldListDTO, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var oldLists []models.OldListDTO
+
+	query := `
+			SELECT id, name, created_at, is_completed, is_cancelled
+			FROM lists WHERE user_id=$1 AND (is_completed=true OR is_cancelled=true)
+		`
+	rows, err := r.Conn.QueryContext(ctx, query, userID)
+	if err != nil {
+		return oldLists, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var list models.OldListDTO
+		var timestamp int64
+		err := rows.Scan(&list.ID, &list.Name, &timestamp, &list.IsCompleted, &list.IsCancelled)
+		if err != nil {
+			return oldLists, err
+		}
+		list.Date = time.Unix(timestamp, 0)
+		oldLists = append(oldLists, list)
+	}
+
+	if rows.Err() != nil {
+		return oldLists, rows.Err()
+	}
+	return oldLists, nil
+}
+
+func (r *ListsRepoPostgres) GetByID(userID, listsId int64) (models.ListDTO, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var listID int64
+	var listName string
+	var listCreatedAt int64
+	var isCompleted bool
+	var isCancelled bool
+	list := models.ListDTO{}
+
+	tx, err := r.Conn.BeginTx(ctx, nil)
+	if err != nil {
+		return list, err
+	}
+	defer tx.Rollback()
+
+	query1 := `
+		SELECT l.id, l.name, l.created_at, l.is_completed, l.is_cancelled 
+		FROM lists AS l WHERE l.user_id=$1 AND l.id=$2
+		`
+	row := tx.QueryRowContext(ctx, query1, userID, listsId)
+	err = row.Scan(&listID, &listName, &listCreatedAt, &isCompleted, &isCancelled)
+	if err != nil && strings.Contains(err.Error(), "no rows in result set") {
+		return list, err
+	}
+
+	var items []models.SelectedItemDTO
+
+	query2 := `
+			SELECT i_sel.id, i_sel.quantity, i.name, i.id 
+			FROM items_selected AS i_sel 
+			INNER JOIN items AS i ON i_sel.item_id=i.id
+			WHERE i_sel.list_id=$1
+    	`
+	rows, err := tx.QueryContext(ctx, query2, listID)
+	if err != nil {
+		return list, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		item := models.SelectedItemDTO{}
+		err := rows.Scan(&item.ID, &item.Quantity, &item.Name, &item.ItemID)
+		if err != nil {
+			return list, nil
+		}
+		items = append(items, item)
+	}
+
+	if rows.Err() != nil {
+		return list, rows.Err()
+	}
+
+	if err = tx.Commit(); err != nil {
+		return list, err
+	}
+
+	list.ID = listID
+	list.Name = listName
+	list.Date = time.Unix(listCreatedAt, 0)
+	list.Items = items
+	list.IsCompleted = isCompleted
+	list.IsCancelled = isCancelled
+
+	return list, nil
+}

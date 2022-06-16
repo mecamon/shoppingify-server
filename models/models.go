@@ -67,10 +67,20 @@ type List struct {
 }
 
 type ListDTO struct {
-	ID    int64             `json:"id"`
-	Name  string            `json:"name"`
-	Date  time.Time         `json:"date"`
-	Items []SelectedItemDTO `json:"items"`
+	ID          int64             `json:"id"`
+	Name        string            `json:"name"`
+	Date        time.Time         `json:"date"`
+	Items       []SelectedItemDTO `json:"items"`
+	IsCompleted bool              `json:"is_completed"`
+	IsCancelled bool              `json:"is_cancelled"`
+}
+
+type OldListDTO struct {
+	ID          int64     `json:"id"`
+	Name        string    `json:"name"`
+	Date        time.Time `json:"date"`
+	IsCompleted bool      `json:"is_completed"`
+	IsCancelled bool      `json:"is_cancelled"`
 }
 
 type SelectedItem struct {

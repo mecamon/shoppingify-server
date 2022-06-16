@@ -313,3 +313,30 @@ func TestListsRepoPostgres_CancelActive_Error(t *testing.T) {
 		t.Error("expected an error but did not get it")
 	}
 }
+
+func TestListsRepoPostgres_GetOldOnes(t *testing.T) {
+	oldList, err := listsRepo.GetOldOnes(userIDForListRepo)
+	if err != nil {
+		t.Error(err.Error())
+	}
+	if len(oldList) == 0 {
+		t.Error("expected length of oldList was longer than 0")
+	}
+}
+
+func TestListsRepoPostgres_GetByID_Success(t *testing.T) {
+	list, err := listsRepo.GetByID(userIDForListRepo, insertedListID)
+	if err != nil {
+		t.Error(err.Error())
+	}
+	if list.ID == 0 {
+		t.Error("did not find any list with that ID")
+	}
+}
+
+func TestListsRepoPostgres_GetByID_Error(t *testing.T) {
+	_, err := listsRepo.GetByID(userIDForListRepo, 5674)
+	if err == nil {
+		t.Error("error expected but did not get it")
+	}
+}

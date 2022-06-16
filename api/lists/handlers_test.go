@@ -6,6 +6,7 @@ package lists
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/mecamon/shoppingify-server/api/repositories"
 	"github.com/mecamon/shoppingify-server/config"
 	"github.com/mecamon/shoppingify-server/models"
@@ -370,6 +371,42 @@ func TestHandler_CompleteActive(t *testing.T) {
 	for _, tt := range testsCompleteActive {
 		rr := httptest.NewRecorder()
 		req := httptest.NewRequest(http.MethodDelete, "/api/lists/cancel-active", nil)
+		req.Header.Set("Accept-Language", "en-EN")
+		req.Header.Set("Authorization", tokenForTests)
+		Router.ServeHTTP(rr, req)
+
+		if rr.Code != tt.expectedStatusCode {
+			t.Errorf("expected statusCode was %d but got %d", tt.expectedStatusCode, rr.Code)
+		}
+	}
+}
+
+func TestHandler_GetOldLists(t *testing.T) {
+	rr := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, "/api/lists/old-lists", nil)
+	req.Header.Set("Accept-Language", "en-EN")
+	req.Header.Set("Authorization", tokenForTests)
+	Router.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Errorf("expected statusCode was %d but got %d", http.StatusOK, rr.Code)
+	}
+}
+
+func TestHandler_GetByID(t *testing.T) {
+	var testsGetByID = []struct {
+		testName           string
+		routeParam         int64
+		expectedStatusCode int
+	}{
+		{testName: "valid-request", routeParam: currentActiveListID, expectedStatusCode: http.StatusOK},
+		{testName: "invalid-route-param", routeParam: 3442343, expectedStatusCode: http.StatusBadRequest},
+	}
+
+	for _, tt := range testsGetByID {
+		t.Log(tt.testName)
+		rr := httptest.NewRecorder()
+		req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/api/lists/%d", tt.routeParam), nil)
 		req.Header.Set("Accept-Language", "en-EN")
 		req.Header.Set("Authorization", tokenForTests)
 		Router.ServeHTTP(rr, req)

@@ -2,12 +2,14 @@ package lists
 
 import (
 	"encoding/json"
+	"github.com/go-chi/chi/v5"
 	"github.com/mecamon/shoppingify-server/api/repositories"
 	"github.com/mecamon/shoppingify-server/config"
 	appi18n "github.com/mecamon/shoppingify-server/i18n"
 	"github.com/mecamon/shoppingify-server/models"
 	"github.com/mecamon/shoppingify-server/utils"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -319,4 +321,59 @@ func (h *Handler) CompleteActive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	utils.Response(w, http.StatusOK, nil)
+}
+
+func (h *Handler) GetOldLists(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value("ID").(int64)
+	_ = r.Header.Get("Accept-Language")
+
+	oldLists, err := h.repos.ListsRepoImpl.GetOldOnes(userID)
+	if err != nil {
+		h.app.Loggers.Error.Println(err.Error())
+		utils.Response(w, http.StatusInternalServerError, nil)
+		return
+	}
+
+	output, err := json.Marshal(oldLists)
+	if err != nil {
+		h.app.Loggers.Error.Println(err.Error())
+		utils.Response(w, http.StatusInternalServerError, nil)
+		return
+	}
+	utils.Response(w, http.StatusOK, output)
+}
+
+func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) {
+	lang := r.Header.Get("Accept-Language")
+	locales := appi18n.GetLocales(lang)
+
+	userID := r.Context().Value("ID").(int64)
+	listIDStr := chi.URLParam(r, "listID")
+	listID, err := strconv.ParseInt(listIDStr, 10, 64)
+	if err != nil {
+		msg := locales.GetMsg("InvalidRouteParam", nil)
+		errMap := models.ErrorMap{"param": msg}
+		output, _ := json.Marshal(errMap)
+		utils.Response(w, http.StatusBadRequest, output)
+		return
+	}
+
+	list, err := h.repos.ListsRepoImpl.GetByID(userID, listID)
+	if err != nil {
+		h.app.Loggers.Warning.Println(err.Error())
+		td := map[string]interface{}{"Item": listID}
+		msg := locales.GetMsg("DoesNotExist", td)
+		errMap := models.ErrorMap{"listID": msg}
+		output, _ := json.Marshal(errMap)
+		utils.Response(w, http.StatusBadRequest, output)
+		return
+	}
+
+	output, err := json.Marshal(list)
+	if err != nil {
+		h.app.Loggers.Error.Println(err.Error())
+		utils.Response(w, http.StatusInternalServerError, nil)
+		return
+	}
+	utils.Response(w, http.StatusOK, output)
 }

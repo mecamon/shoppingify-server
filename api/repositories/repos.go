@@ -69,6 +69,8 @@ type ListsRepo interface {
 	UpdateItemsSelected(items []models.UpdateSelItemDTO) error
 	CancelActive(userID int64) error
 	CompleteActive(userID int64) error
+	GetOldOnes(userID int64) ([]models.OldListDTO, error)
+	GetByID(userID, listsId int64) (models.ListDTO, error)
 }
 
 type TopCategoriesRepo interface {

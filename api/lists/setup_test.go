@@ -60,6 +60,8 @@ func setup() *sql.DB {
 	r.Put("/api/lists/selected-items", listsHandler.CompleteItemSelected)
 	r.Delete("/api/lists/cancel-active", listsHandler.CancelActive)
 	r.Patch("/api/lists/complete-active", listsHandler.CompleteActive)
+	r.Get("/api/lists/old-lists", listsHandler.GetOldLists)
+	r.Get("/api/lists/{listID}", listsHandler.GetByID)
 	Router = r
 
 	generateTokenForTests()

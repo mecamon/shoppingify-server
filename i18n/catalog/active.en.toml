@@ -76,3 +76,7 @@ other = "cannot execute operations over inactive lists"
 [NoActiveList]
 description = "No active list display error"
 other = "no active list yet"
+
+[InvalidRouteParam]
+description = "Message for invalid argument"
+other = "the type of the route param is not correct"
