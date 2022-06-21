@@ -9,6 +9,7 @@ import (
 	"github.com/mecamon/shoppingify-server/models"
 	"github.com/mecamon/shoppingify-server/utils"
 	"net/http"
+	"strings"
 )
 
 type Handler struct {
@@ -32,6 +33,7 @@ func InitHandler(app *config.App) *Handler {
 // @Produce      json
 // @Success      200  {object} models.Created
 // @Failure      400  {object}  models.ErrorMapDTO
+// @Failure      409  {object}  models.ErrorMapDTO
 // @Failure      500
 // @Router       /api/categories [post]
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
@@ -58,8 +60,17 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	completedCategory := categoryDom.completeCategory()
 	ID, err := h.Repos.CategoriesRepoImpl.RegisterCategory(completedCategory)
 	if err != nil {
-		h.App.Loggers.Error.Println(err.Error())
-		panic(w)
+		if strings.Contains(err.Error(), "unique constraint") {
+			h.App.Loggers.Info.Println(err.Error())
+			errMsg := appLocales.GetMsg("CategoryNameInUse", nil)
+			errMap := models.ErrorMap{"error": errMsg}
+			output, _ := json.MarshalIndent(errMap, "", "    ")
+			utils.Response(w, http.StatusConflict, output)
+			return
+		} else {
+			h.App.Loggers.Error.Println(err.Error())
+			panic(w)
+		}
 	}
 	_, err = h.Repos.TopCategoriesImpl.Add(userId, ID)
 	if err != nil {

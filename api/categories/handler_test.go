@@ -32,6 +32,7 @@ var createTests = []struct {
 }{
 	{testName: "invalid-category-name", cat: models.Category{Name: ""}, expectedCode: http.StatusBadRequest},
 	{testName: "valid-category", cat: models.Category{Name: "Plastics"}, expectedCode: http.StatusCreated},
+	{testName: "duplicated-category-name", cat: models.Category{Name: "Plastics"}, expectedCode: http.StatusConflict},
 }
 
 func TestHandler_Create(t *testing.T) {
@@ -53,7 +54,7 @@ func TestHandler_GetAllByName(t *testing.T) {
 	q := "ea"
 
 	rr := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/api/categories/by-name?name="+q, nil)
+	req := httptest.NewRequest(http.MethodGet, "/api/categories/by-name?q="+q, nil)
 	req.Header.Set("Authorization", userToken)
 
 	Router.ServeHTTP(rr, req)

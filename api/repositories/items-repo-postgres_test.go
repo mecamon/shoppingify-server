@@ -10,14 +10,17 @@ import (
 	"testing"
 )
 
-func TestItemsRepoPostgres_Register(t *testing.T) {
-	insertedUserId, _ := authRepo.Register(fixtures_items_repo.User)
-	cat := fixtures_items_repo.Cat
-	cat.UserID = insertedUserId
+var itemsUserID int64
+var itemsCategoryID int64
 
-	insertedCatID, _ := categoriesRepo.RegisterCategory(cat)
+func TestItemsRepoPostgres_Register(t *testing.T) {
+	itemsUserID, _ = authRepo.Register(fixtures_items_repo.User)
+	cat := fixtures_items_repo.Cat
+	cat.UserID = itemsUserID
+
+	itemsCategoryID, _ = categoriesRepo.RegisterCategory(cat)
 	item1 := fixtures_items_repo.Item1
-	item1.CategoryID = insertedCatID
+	item1.CategoryID = itemsCategoryID
 
 	_, err := itemsRepo.Register(item1)
 	if err != nil {
@@ -25,11 +28,21 @@ func TestItemsRepoPostgres_Register(t *testing.T) {
 	}
 
 	item2 := fixtures_items_repo.Item2
-	item2.CategoryID = insertedCatID
+	item2.CategoryID = itemsCategoryID
 
 	_, err = itemsRepo.Register(item2)
 	if err != nil {
 		t.Error(err.Error())
+	}
+}
+
+func TestItemsRepoPostgres_Register_DuplicateName(t *testing.T) {
+	item1 := fixtures_items_repo.Item1
+	item1.CategoryID = itemsCategoryID
+
+	_, err := itemsRepo.Register(item1)
+	if err == nil {
+		t.Error("expected an error by duplicate name but did not get it")
 	}
 }
 

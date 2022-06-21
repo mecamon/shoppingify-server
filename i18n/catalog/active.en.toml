@@ -18,6 +18,14 @@ description = "Error message for email already in use"
 one = "the email inserted is already in use"
 other = "the email inserted is already in use"
 
+[CategoryNameInUse]
+description = "Error message for category name duplicated"
+other = "the category name inserted is already in use"
+
+[ItemNameInUse]
+description = "Error message for item name duplicated in the same category"
+other = "the item name inserted is already in use in the current category"
+
 [InvalidEmailOrPassword]
 description = "Error message for bad credentials login"
 one = "wrong email or password"

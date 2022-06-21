@@ -35,6 +35,7 @@ func InitHandler(conf *config.App) *Handler {
 // @Produce      json
 // @Success      200  {object} models.Created
 // @Failure      400  {object}  models.ErrorMapDTO
+// @Failure      409  {object}  models.ErrorMapDTO
 // @Failure      500
 // @Router       /api/items [post]
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
@@ -92,8 +93,17 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	completedItem := itemDom.completedItemInfo()
 	insertedID, err := h.repos.ItemsRepoIpml.Register(completedItem)
 	if err != nil {
-		h.app.Loggers.Error.Println(err.Error())
-		panic(w)
+		if strings.Contains(err.Error(), "unique constraint") {
+			h.app.Loggers.Info.Println(err.Error())
+			errMsg := appLocales.GetMsg("ItemNameInUse", nil)
+			errMap := models.ErrorMap{"error": errMsg}
+			output, _ := json.MarshalIndent(errMap, "", "    ")
+			utils.Response(w, http.StatusConflict, output)
+			return
+		} else {
+			h.app.Loggers.Error.Println(err.Error())
+			panic(w)
+		}
 	}
 
 	_, err = h.repos.TopItemsImpl.Add(userID, insertedID)

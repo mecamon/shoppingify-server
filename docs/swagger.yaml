@@ -305,6 +305,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/models.ErrorMapDTO'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/models.ErrorMapDTO'
         "500":
           description: ""
       summary: Creates a new category
@@ -399,6 +403,10 @@ paths:
             $ref: '#/definitions/models.Created'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorMapDTO'
+        "409":
+          description: Conflict
           schema:
             $ref: '#/definitions/models.ErrorMapDTO'
         "500":

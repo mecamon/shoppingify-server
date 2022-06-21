@@ -12,11 +12,13 @@ import (
 	"time"
 )
 
+var userID int64
+
 func TestItemsRepoPostgres_RegisterCategory(t *testing.T) {
 	user := fixtures_categoryies_repo.User
 	hashedPass, _ := utils.GenerateHash(fixtures_categoryies_repo.User.Password)
 	user.Password = hashedPass
-	userID, _ := authRepo.Register(user)
+	userID, _ = authRepo.Register(user)
 
 	cat := fixtures_categoryies_repo.Cat1
 	cat.UserID = userID
@@ -24,6 +26,16 @@ func TestItemsRepoPostgres_RegisterCategory(t *testing.T) {
 	_, err := categoriesRepo.RegisterCategory(cat)
 	if err != nil {
 		t.Error("error registering category: ", err.Error())
+	}
+}
+
+func TestItemsRepoPostgres_RegisterCategory_DuplicateName(t *testing.T) {
+	cat := fixtures_categoryies_repo.Cat1
+	cat.UserID = userID
+
+	_, err := categoriesRepo.RegisterCategory(cat)
+	if err == nil {
+		t.Error("expected an error by duplicate but did not get it")
 	}
 }
 
@@ -93,7 +105,7 @@ func TestCategoriesRepoPostgres_GetAllWithItemName(t *testing.T) {
 	if err != nil {
 		t.Error(err.Error())
 	}
-	cat2 := fixtures_categoryies_repo.Cat1ForItemsName
+	cat2 := fixtures_categoryies_repo.Cat2ForItemsName
 	cat2.UserID = userID
 	insertedCat2ID, err := categoriesRepo.RegisterCategory(cat2)
 	if err != nil {

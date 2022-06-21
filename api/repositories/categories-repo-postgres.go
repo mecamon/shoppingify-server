@@ -21,9 +21,12 @@ func initCategoriesRepo(conn *sql.DB, app *config.App) CategoriesRepo {
 }
 
 func (r *CategoriesRepoPostgres) RegisterCategory(cat models.Category) (int64, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
 	var ID int64
 	query := `INSERT INTO categories (name, user_id, created_at, updated_at) VALUES ($1, $2, $3, $4) RETURNING ID`
-	err := r.Conn.QueryRow(query, cat.Name, cat.UserID, cat.CreatedAt, cat.UpdatedAt).Scan(&ID)
+	err := r.Conn.QueryRowContext(ctx, query, cat.Name, cat.UserID, cat.CreatedAt, cat.UpdatedAt).Scan(&ID)
 	if err != nil {
 		return 0, err
 	}

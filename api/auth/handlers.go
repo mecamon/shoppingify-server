@@ -8,7 +8,6 @@ import (
 	appi18n "github.com/mecamon/shoppingify-server/i18n"
 	"github.com/mecamon/shoppingify-server/models"
 	"github.com/mecamon/shoppingify-server/utils"
-	"log"
 	"net/http"
 	"strings"
 )
@@ -58,7 +57,6 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 
 	id, err := h.repos.AuthRepoImpl.Register(completedUser)
 	if err != nil {
-		log.Println(err.Error())
 		h.app.Loggers.Info.Println(err.Error())
 		if strings.Contains(err.Error(), "unique constraint") {
 			errMsg := locales.GetMsg("EmailAddressTaken", nil)

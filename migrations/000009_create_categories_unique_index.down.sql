@@ -1,0 +1,1 @@
+DROP INDEX categories.idx_cat_name_userid

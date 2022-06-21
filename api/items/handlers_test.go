@@ -44,6 +44,12 @@ var createItemsTests = []struct {
 		expectedStatusCode: http.StatusCreated,
 		expectedErrors:     0,
 	},
+	{
+		testName:           "duplicated-item-name",
+		item:               models.Item{Name: "Pineapple", Note: "This is just a fruit"},
+		expectedStatusCode: http.StatusConflict,
+		expectedErrors:     1,
+	},
 }
 
 func TestHandler_Create(t *testing.T) {

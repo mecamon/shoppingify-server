@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX idx_cat_name_userid on categories(user_id, name)

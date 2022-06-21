@@ -218,6 +218,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/models.ErrorMapDTO"
                         }
                     },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMapDTO"
+                        }
+                    },
                     "500": {
                         "description": ""
                     }
@@ -360,6 +366,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMapDTO"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorMapDTO"
                         }

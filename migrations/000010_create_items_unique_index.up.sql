@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX idx_items_name_catid ON items(category_id, name)

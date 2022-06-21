@@ -1,0 +1,1 @@
+DROP INDEX items.idx_items_name_catid
