@@ -10,19 +10,19 @@ import (
 
 var validCredTests = []struct {
 	name           string
-	auth           models.User
+	auth           models.UserDTO
 	expectedValid  bool
 	expectedErrors int
 }{
 	{
 		name:           "invalid credentials 1",
-		auth:           models.User{Email: "invalid@!mail", Password: "invalid-pass", Name: "c", Lastname: "d"},
+		auth:           models.UserDTO{Email: "invalid@!mail", Password: "invalid-pass", Name: "c", Lastname: "d"},
 		expectedValid:  false,
 		expectedErrors: 4,
 	},
 	{
 		name:           "valid credentials",
-		auth:           models.User{Email: "valid@email.com", Password: "SecurePassword1123", Name: "Bonjovi", Lastname: "Jon"},
+		auth:           models.UserDTO{Email: "valid@email.com", Password: "SecurePassword1123", Name: "Bonjovi", Lastname: "Jon"},
 		expectedValid:  true,
 		expectedErrors: 0,
 	},
@@ -42,7 +42,7 @@ func TestValidCredentials(t *testing.T) {
 }
 
 func TestCompleteUserInformation(t *testing.T) {
-	user := models.User{
+	user := models.UserDTO{
 		Name:     "Charles",
 		Lastname: "Maze",
 		Email:    "charles@maze.com",

@@ -24,22 +24,22 @@ func TestInitHandler(t *testing.T) {
 
 var registerTests = []struct {
 	testName           string
-	user               models.User
+	user               models.UserDTO
 	expectedStatusCode int
 }{
-	{testName: "invalid-user-data", user: models.User{
+	{testName: "invalid-user-data", user: models.UserDTO{
 		Name:     "c",
 		Lastname: "a",
 		Email:    "mail-not-valid.com",
 		Password: "1234566",
 	}, expectedStatusCode: http.StatusBadRequest},
-	{testName: "email-in-use", user: models.User{
+	{testName: "email-in-use", user: models.UserDTO{
 		Name:     "Pepe",
 		Lastname: "Pepega",
 		Email:    LoginUserData.Email,
 		Password: LoginUserData.Password,
 	}, expectedStatusCode: http.StatusConflict},
-	{testName: "valid-user-data", user: models.User{
+	{testName: "valid-user-data", user: models.UserDTO{
 		Name:     "Carlos",
 		Lastname: "Mejia",
 		Email:    "carlos@mejia.com",

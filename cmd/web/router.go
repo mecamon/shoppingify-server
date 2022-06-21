@@ -10,6 +10,8 @@ import (
 	top_categories "github.com/mecamon/shoppingify-server/api/top-categories"
 	top_items "github.com/mecamon/shoppingify-server/api/top-items"
 	"github.com/mecamon/shoppingify-server/config"
+	_ "github.com/mecamon/shoppingify-server/docs"
+	httpSwagger "github.com/swaggo/http-swagger"
 	"net/http"
 )
 
@@ -38,6 +40,9 @@ func makeRouter() http.Handler {
 	r.Mount("/api/top-categories", top_categories.Routes())
 	top_items.InitHandler(appConfig)
 	r.Mount("/api/top-items", top_items.Routes())
+
+	// Documenting the api
+	r.Get("/swagger/*", httpSwagger.Handler(httpSwagger.URL("http://localhost:8080/swagger/doc.json")))
 
 	return r
 }

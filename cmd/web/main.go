@@ -9,6 +9,10 @@ import (
 	"net/http"
 )
 
+// @title shoppingify-server APIs
+// @version 1.0
+// @description shopping list site APIs
+// @BasePath /
 func main() {
 	run()
 }

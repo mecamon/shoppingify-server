@@ -53,7 +53,7 @@ func TestHandler_GetAllByName(t *testing.T) {
 	q := "ea"
 
 	rr := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/api/categories/by-name?q="+q, nil)
+	req := httptest.NewRequest(http.MethodGet, "/api/categories/by-name?name="+q, nil)
 	req.Header.Set("Authorization", userToken)
 
 	Router.ServeHTTP(rr, req)

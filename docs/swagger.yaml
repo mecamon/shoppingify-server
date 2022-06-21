@@ -1,0 +1,743 @@
+basePath: /
+definitions:
+  models.AddSelectedItemDTO:
+    properties:
+      item_id:
+        type: integer
+      list_id:
+        type: integer
+      quantity:
+        type: integer
+    type: object
+  models.Auth:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  models.AuthorizationDTO:
+    properties:
+      token:
+        type: string
+    type: object
+  models.CategoriesGroup:
+    properties:
+      category_id:
+        type: integer
+      category_name:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/models.ItemDTO'
+        type: array
+    type: object
+  models.CategoryDTO:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  models.CreateListDTO:
+    properties:
+      name:
+        type: string
+    type: object
+  models.Created:
+    properties:
+      inserted_id:
+        type: integer
+    type: object
+  models.ErrorMapDTO:
+    properties:
+      issue: {}
+    type: object
+  models.ItemDTO:
+    properties:
+      category_id:
+        type: integer
+      id:
+        type: integer
+      image_url:
+        type: string
+      name:
+        type: string
+      note:
+        type: string
+    type: object
+  models.ItemFormDTO:
+    properties:
+      category_id:
+        type: integer
+      file: {}
+      id:
+        type: integer
+      name:
+        type: string
+      note:
+        type: string
+    type: object
+  models.ItemSelIDDTO:
+    properties:
+      item_sel_id:
+        type: integer
+    type: object
+  models.ListDTO:
+    properties:
+      date:
+        type: string
+      id:
+        type: integer
+      is_cancelled:
+        type: boolean
+      is_completed:
+        type: boolean
+      items:
+        items:
+          $ref: '#/definitions/models.SelectedItemDTO'
+        type: array
+      name:
+        type: string
+    type: object
+  models.OldListDTO:
+    properties:
+      date:
+        type: string
+      id:
+        type: integer
+      is_cancelled:
+        type: boolean
+      is_completed:
+        type: boolean
+      name:
+        type: string
+    type: object
+  models.SelectedItemDTO:
+    properties:
+      id:
+        type: integer
+      item_id:
+        type: integer
+      name:
+        type: string
+      quantity:
+        type: integer
+    type: object
+  models.TopCategoryDTO:
+    properties:
+      category_id:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+      percentage:
+        type: integer
+      sum_quantity:
+        type: integer
+    type: object
+  models.TopItemDTO:
+    properties:
+      id:
+        type: integer
+      item_id:
+        type: integer
+      name:
+        type: string
+      percentage:
+        type: integer
+      sum_quantity:
+        type: integer
+    type: object
+  models.UpdateSelItemDTO:
+    properties:
+      item_id:
+        type: integer
+      quantity:
+        type: integer
+    type: object
+  models.UserDTO:
+    properties:
+      email:
+        type: string
+      lastname:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: shopping list site APIs
+  title: shoppingify-server APIs
+  version: "1.0"
+paths:
+  /api/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login to a new user permanent
+      parameters:
+      - description: auth credentials
+        in: body
+        name: auth
+        required: true
+        schema:
+          $ref: '#/definitions/models.Auth'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.AuthorizationDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorMapDTO'
+        "500":
+          description: ""
+      summary: Login as saved user
+      tags:
+      - accounts
+  /api/auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Registers a new user permanent
+      parameters:
+      - description: auth info
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.AuthorizationDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorMapDTO'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/models.ErrorMapDTO'
+        "500":
+          description: ""
+      summary: Registers a user
+      tags:
+      - accounts
+  /api/auth/visitor-register:
+    post:
+      consumes:
+      - application/json
+      description: Login to a new user permanent
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.AuthorizationDTO'
+        "500":
+          description: ""
+      summary: Login as saved user
+      tags:
+      - accounts
+  /api/categories:
+    get:
+      consumes:
+      - application/json
+      description: Get categories. Pagination is able
+      parameters:
+      - description: items to take in query
+        in: query
+        name: take
+        type: integer
+      - description: items to skip in query
+        in: query
+        name: skip
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.CategoryDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorMapDTO'
+        "500":
+          description: ""
+      summary: Get categories
+      tags:
+      - categories
+    post:
+      consumes:
+      - application/json
+      description: Creates a new category. It needs to have an unique name
+      parameters:
+      - description: categorty info
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.CategoryDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Created'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorMapDTO'
+        "500":
+          description: ""
+      summary: Creates a new category
+      tags:
+      - categories
+  /api/categories/by-name:
+    get:
+      consumes:
+      - application/json
+      description: Get categories by name. Pagination is able
+      parameters:
+      - description: category search query
+        in: query
+        name: q
+        required: true
+        type: string
+      - description: items to take in query
+        in: query
+        name: take
+        type: integer
+      - description: items to skip in query
+        in: query
+        name: skip
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.CategoryDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorMapDTO'
+        "500":
+          description: ""
+      summary: Get categories by name
+      tags:
+      - categories
+  /api/items:
+    get:
+      consumes:
+      - application/json
+      description: Get items by category groups. Pagination is available
+      parameters:
+      - description: items to take in query
+        in: query
+        name: take
+        type: integer
+      - description: items to skip in query
+        in: query
+        name: skip
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.CategoriesGroup'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorMapDTO'
+        "500":
+          description: ""
+      summary: Get items by category groups
+      tags:
+      - items
+    post:
+      consumes:
+      - multipart/form-data
+      description: Creates a new item. It needs to have an unique name
+      parameters:
+      - description: item info
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/models.ItemFormDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Created'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorMapDTO'
+        "500":
+          description: ""
+      summary: Creates a new item
+      tags:
+      - items
+  /api/items/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get an item by id
+      parameters:
+      - description: item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ItemDTO'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorMapDTO'
+        "500":
+          description: ""
+      summary: Get an item by id
+      tags:
+      - items
+  /api/lists/{listId}:
+    get:
+      consumes:
+      - application/json
+      description: Get list by id
+      parameters:
+      - description: list ID
+        in: path
+        name: listID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ListDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorMapDTO'
+        "500":
+          description: ""
+      summary: Get list by id
+      tags:
+      - lists
+  /api/lists/active:
+    get:
+      consumes:
+      - application/json
+      description: Get active list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ListDTO'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorMapDTO'
+        "500":
+          description: ""
+      summary: Get active list
+      tags:
+      - lists
+  /api/lists/add-item:
+    post:
+      consumes:
+      - application/json
+      description: Add item to active list
+      parameters:
+      - description: item to add to the active list
+        in: body
+        name: selectedItem
+        required: true
+        schema:
+          $ref: '#/definitions/models.AddSelectedItemDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Created'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorMapDTO'
+        "500":
+          description: ""
+      summary: Add item to active list
+      tags:
+      - lists
+  /api/lists/cancel-active:
+    delete:
+      consumes:
+      - application/json
+      description: Cancel the active list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorMapDTO'
+        "500":
+          description: ""
+      summary: Cancel the active list
+      tags:
+      - lists
+  /api/lists/complete-active:
+    patch:
+      consumes:
+      - application/json
+      description: Completes the active list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorMapDTO'
+        "500":
+          description: ""
+      summary: Completes the active list
+      tags:
+      - lists
+  /api/lists/create:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new list. Only one can be active at a time
+      parameters:
+      - description: list info
+        in: body
+        name: list
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateListDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Created'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorMapDTO'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/models.ErrorMapDTO'
+        "500":
+          description: ""
+      summary: Creates a new list
+      tags:
+      - lists
+  /api/lists/name:
+    patch:
+      consumes:
+      - application/json
+      description: Update active list name
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorMapDTO'
+        "500":
+          description: ""
+      summary: Update active list name
+      tags:
+      - lists
+  /api/lists/old-lists:
+    get:
+      consumes:
+      - application/json
+      description: Get old list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.OldListDTO'
+            type: array
+        "500":
+          description: ""
+      summary: Get old list
+      tags:
+      - lists
+  /api/lists/selected-items:
+    delete:
+      consumes:
+      - application/json
+      description: Delete item in active list
+      parameters:
+      - description: id from item to delete
+        in: body
+        name: selectedItem
+        required: true
+        schema:
+          $ref: '#/definitions/models.ItemSelIDDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorMapDTO'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorMapDTO'
+        "500":
+          description: ""
+      summary: Delete item in active list
+      tags:
+      - lists
+    put:
+      consumes:
+      - application/json
+      description: Completes a item in active list
+      parameters:
+      - description: id from item to complete
+        in: body
+        name: selectedItem
+        required: true
+        schema:
+          $ref: '#/definitions/models.ItemSelIDDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorMapDTO'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorMapDTO'
+        "500":
+          description: ""
+      summary: Completes a item in active list
+      tags:
+      - lists
+  /api/lists/update-items:
+    patch:
+      consumes:
+      - application/json
+      description: Update item in active list
+      parameters:
+      - description: update an item in the active list
+        in: body
+        name: selectedItem
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateSelItemDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorMapDTO'
+        "500":
+          description: ""
+      summary: Update item in active list
+      tags:
+      - lists
+  /api/top-categories:
+    get:
+      consumes:
+      - application/json
+      description: Get top categories. Pagination available
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TopCategoryDTO'
+            type: array
+        "500":
+          description: ""
+      summary: Get top categories
+      tags:
+      - top categories
+  /api/top-items:
+    get:
+      consumes:
+      - application/json
+      description: Get top items. Pagination available
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TopItemDTO'
+            type: array
+        "500":
+          description: ""
+      summary: Get top items
+      tags:
+      - top items
+swagger: "2.0"

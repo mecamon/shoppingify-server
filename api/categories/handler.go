@@ -23,6 +23,17 @@ func InitHandler(app *config.App) *Handler {
 	return handler
 }
 
+// ShowAccount godoc
+// @Summary      Creates a new category
+// @Description  Creates a new category. It needs to have an unique name
+// @Tags         categories
+// @Param        user    body     models.CategoryDTO  true  "categorty info"
+// @Accept       json
+// @Produce      json
+// @Success      200  {object} models.Created
+// @Failure      400  {object}  models.ErrorMapDTO
+// @Failure      500
+// @Router       /api/categories [post]
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	lang := r.Header.Get("Accept-Language")
 	appLocales := appi18n.GetLocales(lang)
@@ -55,11 +66,25 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 		h.App.Loggers.Error.Println(err.Error())
 	}
 
-	res := map[string]interface{}{"InsertedID": ID}
+	res := models.Created{InsertedID: ID}
 	output, _ := json.MarshalIndent(res, "", "    ")
 	utils.Response(w, http.StatusCreated, output)
 }
 
+// ShowAccount godoc
+// @Summary      Get categories by name
+// @Description  Get categories by name. Pagination is able
+// @Tags         categories
+// @Param        q    query     string  true  "category search query"
+// @Param        take    query     int  false  "items to take in query"
+// @Param        skip    query     int  false  "items to skip in query"
+// @Header       200              {string}  X-Total-Count  "total of items"
+// @Accept       json
+// @Produce      json
+// @Success      200  {array} models.CategoryDTO
+// @Failure      400  {object}  models.ErrorMapDTO
+// @Failure      500
+// @Router       /api/categories/by-name [get]
 func (h *Handler) GetAllByName(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query().Get("q")
 
@@ -86,6 +111,19 @@ func (h *Handler) GetAllByName(w http.ResponseWriter, r *http.Request) {
 	w.Write(output)
 }
 
+// ShowAccount godoc
+// @Summary      Get categories
+// @Description  Get categories. Pagination is able
+// @Tags         categories
+// @Param        take    query     int  false  "items to take in query"
+// @Param        skip    query     int  false  "items to skip in query"
+// @Header       200              {string}  X-Total-Count  "total of items"
+// @Accept       json
+// @Produce      json
+// @Success      200  {array} models.CategoryDTO
+// @Failure      400  {object}  models.ErrorMapDTO
+// @Failure      500
+// @Router       /api/categories [get]
 func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request) {
 	takeQuery := r.URL.Query().Get("take")
 	take, _ := utils.QueryConvertInt(takeQuery, 12)

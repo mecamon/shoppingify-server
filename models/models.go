@@ -18,6 +18,13 @@ type User struct {
 	UpdatedAt int64  `json:"updated_at"`
 }
 
+type UserDTO struct {
+	Name     string `json:"name"`
+	Lastname string `json:"lastname"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 type Item struct {
 	ID         int64  `json:"id"`
 	Name       string `json:"name"`
@@ -34,6 +41,14 @@ type ItemDTO struct {
 	Note       string `json:"note"`
 	ImageURL   string `json:"image_url"`
 	CategoryID int64  `json:"category_id"`
+}
+
+type ItemFormDTO struct {
+	ID         int64       `json:"id"`
+	Name       string      `json:"name"`
+	Note       string      `json:"note"`
+	File       interface{} `json:"file"`
+	CategoryID int64       `json:"category_id"`
 }
 
 type CategoriesGroup struct {
@@ -66,6 +81,10 @@ type List struct {
 	CompletedAt int64  `json:"completed_at"`
 }
 
+type CreateListDTO struct {
+	Name string `json:"name"`
+}
+
 type ListDTO struct {
 	ID          int64             `json:"id"`
 	Name        string            `json:"name"`
@@ -95,6 +114,16 @@ type SelectedItem struct {
 
 type UpdateSelItemDTO struct {
 	ItemID   int64 `json:"item_id"`
+	Quantity int   `json:"quantity"`
+}
+
+type ItemSelIDDTO struct {
+	ItemSelID int64 `json:"item_sel_id"`
+}
+
+type AddSelectedItemDTO struct {
+	ItemID   int64 `json:"item_id"`
+	ListID   int64 `json:"list_id"`
 	Quantity int   `json:"quantity"`
 }
 
@@ -141,6 +170,18 @@ type Auth struct {
 }
 
 type ErrorMap map[string]string
+
+type ErrorMapDTO struct {
+	Issue interface{} `json:"issue"`
+}
+
+type Created struct {
+	InsertedID int64 `json:"inserted_id"`
+}
+
+type AuthorizationDTO struct {
+	Token string `json:"token"`
+}
 
 type CustomClaims struct {
 	TokenType string

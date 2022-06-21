@@ -11,5 +11,6 @@ func Routes() http.Handler {
 	itemsHandler.Use(middlewares.TokenValidation)
 	itemsHandler.Post("/", handler.Create)
 	itemsHandler.Get("/", handler.GetByCategoryGroups)
+	itemsHandler.Get("/{id}", handler.GetDetailsByID)
 	return itemsHandler
 }

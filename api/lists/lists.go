@@ -9,7 +9,7 @@ import (
 
 type DomLists struct {
 	appLocales    appi18n.AppLocales
-	itemToAdd     models.SelectedItem
+	itemToAdd     models.AddSelectedItemDTO
 	itemsToUpdate []models.UpdateSelItemDTO
 }
 
@@ -34,9 +34,15 @@ func (d *DomLists) validateItemToAdd() (bool, models.ErrorMap) {
 }
 
 func (d *DomLists) completeItemToAdd() models.SelectedItem {
-	d.itemToAdd.CreatedAt = time.Now().Unix()
-	d.itemToAdd.UpdatedAt = time.Now().Unix()
-	return d.itemToAdd
+	itemToAddCompleted := models.SelectedItem{
+		ItemID:      d.itemToAdd.ItemID,
+		Quantity:    d.itemToAdd.Quantity,
+		IsCompleted: false,
+		ListID:      d.itemToAdd.ListID,
+		CreatedAt:   time.Now().Unix(),
+		UpdatedAt:   time.Now().Unix(),
+	}
+	return itemToAddCompleted
 }
 
 func (d *DomLists) validateItemToUpdate() (bool, models.ErrorMap) {

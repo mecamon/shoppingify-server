@@ -266,9 +266,7 @@ func TestHandler_DeleteItemFromList(t *testing.T) {
 
 	for _, tt := range testsDeleteItemFromList {
 		t.Log(tt.testName)
-		body := struct {
-			ItemSelID int64 `json:"item_sel_id"`
-		}{ItemSelID: tt.selItemID}
+		body := models.ItemSelIDDTO{ItemSelID: tt.selItemID}
 		marshalled, err := json.Marshal(body)
 		if err != nil {
 			t.Error(err.Error())

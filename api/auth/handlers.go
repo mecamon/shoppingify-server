@@ -25,10 +25,22 @@ func InitHandler(conf *config.App) *Handler {
 	return handler
 }
 
+// ShowAccount godoc
+// @Summary      Registers a user
+// @Description  Registers a new user permanent
+// @Tags         accounts
+// @Accept       json
+// @Param        user    body     models.UserDTO  true  "auth info"
+// @Produce      json
+// @Success      200  {object}  models.AuthorizationDTO
+// @Failure      400  {object}  models.ErrorMapDTO
+// @Failure      409  {object}  models.ErrorMapDTO
+// @Failure      500
+// @Router       /api/auth/register [post]
 func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 	lang := r.Header.Get("Accept-Language")
 	locales := appi18n.GetLocales(lang)
-	user := models.User{}
+	user := models.UserDTO{}
 	json.NewDecoder(r.Body).Decode(&user)
 
 	valid, errMap := validCredentials(user, lang)
@@ -64,11 +76,24 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 		h.app.Loggers.Info.Println(err.Error())
 		panic(w)
 	}
-	tokenMap := map[string]string{"token": token}
-	output, _ := json.MarshalIndent(tokenMap, "", "    ")
+	tokenOut := models.AuthorizationDTO{
+		Token: token,
+	}
+	output, _ := json.MarshalIndent(tokenOut, "", "    ")
 	utils.Response(w, http.StatusCreated, output)
 }
 
+// ShowAccount godoc
+// @Summary      Login as saved user
+// @Description  Login to a new user permanent
+// @Tags         accounts
+// @Accept       json
+// @param 		 auth body models.Auth true "auth credentials"
+// @Produce      json
+// @Success      200  {object} 	models.AuthorizationDTO
+// @Failure      400  {object}  models.ErrorMapDTO
+// @Failure      500
+// @Router       /api/auth/login [post]
 func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	lang := r.Header.Get("Accept-Language")
 	locales := appi18n.GetLocales(lang)
@@ -104,11 +129,22 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		h.app.Loggers.Error.Println(err.Error())
 		panic(w)
 	}
-	tokenMap := map[string]string{"token": token}
-	output, _ := json.MarshalIndent(tokenMap, "", "    ")
+	tokenOut := models.AuthorizationDTO{
+		Token: token,
+	}
+	output, _ := json.MarshalIndent(tokenOut, "", "    ")
 	utils.Response(w, http.StatusOK, output)
 }
 
+// ShowAccount godoc
+// @Summary      Login as saved user
+// @Description  Login to a new user permanent
+// @Tags         accounts
+// @Accept       json
+// @Produce      json
+// @Success      200 {object} models.AuthorizationDTO
+// @Failure      500
+// @Router       /api/auth/visitor-register [post]
 func (h *Handler) VisitorRegister(w http.ResponseWriter, r *http.Request) {
 	visitor := createVisitorInformation()
 	id, err := h.repos.AuthRepoImpl.Register(visitor)
@@ -122,7 +158,9 @@ func (h *Handler) VisitorRegister(w http.ResponseWriter, r *http.Request) {
 		h.app.Loggers.Error.Println(err.Error())
 		panic(w)
 	}
-	tokenMap := map[string]string{"token": token}
-	output, _ := json.MarshalIndent(tokenMap, "", "    ")
+	tokenOut := models.AuthorizationDTO{
+		Token: token,
+	}
+	output, _ := json.MarshalIndent(tokenOut, "", "    ")
 	utils.Response(w, http.StatusCreated, output)
 }

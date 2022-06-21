@@ -11,26 +11,26 @@ import (
 
 var validItemToAddTests = []struct {
 	testName       string
-	itemToAdd      models.SelectedItem
+	itemToAdd      models.AddSelectedItemDTO
 	isValid        bool
 	expectedErrors int
 }{
-	{testName: "not-itemID-id", isValid: false, expectedErrors: 1, itemToAdd: models.SelectedItem{
+	{testName: "not-itemID-id", isValid: false, expectedErrors: 1, itemToAdd: models.AddSelectedItemDTO{
 		ItemID:   0,
 		Quantity: 3,
 		ListID:   1,
 	}},
-	{testName: "not-listID-id", isValid: false, expectedErrors: 1, itemToAdd: models.SelectedItem{
+	{testName: "not-listID-id", isValid: false, expectedErrors: 1, itemToAdd: models.AddSelectedItemDTO{
 		ItemID:   3,
 		Quantity: 3,
 		ListID:   0,
 	}},
-	{testName: "not-quantity-id", isValid: false, expectedErrors: 1, itemToAdd: models.SelectedItem{
+	{testName: "not-quantity-id", isValid: false, expectedErrors: 1, itemToAdd: models.AddSelectedItemDTO{
 		ItemID:   10,
 		Quantity: 0,
 		ListID:   1,
 	}},
-	{testName: "valid-item", isValid: true, expectedErrors: 0, itemToAdd: models.SelectedItem{
+	{testName: "valid-item", isValid: true, expectedErrors: 0, itemToAdd: models.AddSelectedItemDTO{
 		ItemID:   4,
 		Quantity: 3,
 		ListID:   7,
@@ -55,7 +55,7 @@ func TestDomLists_validateItemToAdd(t *testing.T) {
 }
 
 func TestDomLists_completeItemToAdd(t *testing.T) {
-	item := models.SelectedItem{
+	item := models.AddSelectedItemDTO{
 		ItemID:   2,
 		Quantity: 5,
 		ListID:   7,

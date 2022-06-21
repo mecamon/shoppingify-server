@@ -9,7 +9,6 @@ import (
 	"github.com/mecamon/shoppingify-server/models"
 	"github.com/mecamon/shoppingify-server/services/storage"
 	"github.com/mecamon/shoppingify-server/utils"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -27,6 +26,17 @@ func InitHandler(conf *config.App) *Handler {
 	return handler
 }
 
+// ShowAccount godoc
+// @Summary      Creates a new item
+// @Description  Creates a new item. It needs to have an unique name
+// @Tags         items
+// @Param        item    body     models.ItemFormDTO  true  "item info"
+// @Accept       mpfd
+// @Produce      json
+// @Success      200  {object} models.Created
+// @Failure      400  {object}  models.ErrorMapDTO
+// @Failure      500
+// @Router       /api/items [post]
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	lang := r.Header.Get("Accept-Language")
 	appLocales := appi18n.GetLocales(lang)
@@ -70,7 +80,6 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 		storageService, err := storage.GetStorage()
 		if err != nil {
 			h.app.Loggers.Error.Println(err.Error())
-			log.Println(err.Error()) //TODO REMOVE THIS
 		}
 
 		imageURL, err := storageService.UploadImage(file, fmt.Sprintf("%s-%d", itemDom.item.Name, userID))
@@ -92,11 +101,24 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 		h.app.Loggers.Error.Println(err.Error())
 	}
 
-	res := map[string]interface{}{"insertedID": insertedID}
+	res := models.Created{InsertedID: insertedID}
 	output, _ := json.Marshal(res)
 	utils.Response(w, http.StatusCreated, output)
 }
 
+// ShowAccount godoc
+// @Summary      Get items by category groups
+// @Description  Get items by category groups. Pagination is available
+// @Tags         items
+// @Param        take    query     int  false  "items to take in query"
+// @Param        skip    query     int  false  "items to skip in query"
+// @Header       200              {string}  X-Total-Count  "total of items"
+// @Accept       json
+// @Produce      json
+// @Success      200  {array} models.CategoriesGroup
+// @Failure      400  {object}  models.ErrorMapDTO
+// @Failure      500
+// @Router       /api/items [get]
 func (h *Handler) GetByCategoryGroups(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query().Get("q")
 
@@ -152,6 +174,17 @@ func (h *Handler) GetByCategoryGroups(w http.ResponseWriter, r *http.Request) {
 	w.Write(output)
 }
 
+// ShowAccount godoc
+// @Summary      Get an item by id
+// @Description  Get an item by id
+// @Tags         items
+// @Accept       json
+// @Param        id    path     string  true  "item ID"
+// @Produce      json
+// @Success      200  {object} models.ItemDTO
+// @Failure      404  {object}  models.ErrorMapDTO
+// @Failure      500
+// @Router       /api/items/{id} [get]
 func (h *Handler) GetDetailsByID(w http.ResponseWriter, r *http.Request) {
 	itemId := strings.TrimPrefix(r.URL.Path, "/api/items/")
 	id, err := strconv.ParseInt(itemId, 10, 64)

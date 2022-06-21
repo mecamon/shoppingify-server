@@ -55,7 +55,7 @@ func shutdown(conn *sql.DB) {
 }
 
 func seedDataForIntTests(repos repositories.MainRepo) {
-	seedUser := models.User{
+	seedUser := models.UserDTO{
 		Name:     LoginUserData.Name,
 		Lastname: LoginUserData.Lastname,
 		Email:    LoginUserData.Email,

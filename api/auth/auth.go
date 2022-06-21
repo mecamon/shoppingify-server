@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func validCredentials(user models.User, lang string) (bool, models.ErrorMap) {
+func validCredentials(user models.UserDTO, lang string) (bool, models.ErrorMap) {
 	appLocales := appi18n.GetLocales(lang)
 	errMap := models.ErrorMap{}
 	nameMinimalLength := 2
@@ -31,7 +31,7 @@ func validCredentials(user models.User, lang string) (bool, models.ErrorMap) {
 	return len(errMap) == 0, errMap
 }
 
-func completeUserInformation(user models.User) (models.User, error) {
+func completeUserInformation(user models.UserDTO) (models.User, error) {
 	hashedPass, err := utils.GenerateHash(user.Password)
 	if err != nil {
 		return models.User{}, err

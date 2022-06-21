@@ -20,6 +20,17 @@ func InitHandler(conf *config.App) *Handler {
 	return handler
 }
 
+// ShowAccount godoc
+// @Summary      Get top categories
+// @Description  Get top categories. Pagination available
+// @Tags         top categories
+// @params 		 take query int false "items to take in query"
+// @params 		 skip query int false "items to skip in query"
+// @Accept       json
+// @Produce      json
+// @Success      200  {array} models.TopCategoryDTO
+// @Failure      500
+// @Router       /api/top-categories [get]
 func (h *Handler) GetTop(w http.ResponseWriter, r *http.Request) {
 	_ = r.Header.Get("Accept-Language")
 	userID := r.Context().Value("ID").(int64)

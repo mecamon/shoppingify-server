@@ -26,13 +26,23 @@ func InitHandler(conf *config.App) *Handler {
 	return handler
 }
 
+// ShowAccount godoc
+// @Summary      Creates a new list
+// @Description  Creates a new list. Only one can be active at a time
+// @Tags         lists
+// @Param        list    body     models.CreateListDTO  true  "list info"
+// @Accept       json
+// @Produce      json
+// @Success      200  {object} models.Created
+// @Failure      400  {object}  models.ErrorMapDTO
+// @Failure      409  {object}  models.ErrorMapDTO
+// @Failure      500
+// @Router       /api/lists/create [post]
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	lang := r.Header.Get("Accept-Language")
 	locales := appi18n.GetLocales(lang)
 	userID := r.Context().Value("ID").(int64)
-	body := struct {
-		Name string `json:"name"`
-	}{}
+	body := models.CreateListDTO{}
 	err := json.NewDecoder(r.Body).Decode(&body)
 	if err != nil {
 		h.app.Loggers.Error.Println(err.Error())
@@ -79,6 +89,16 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	utils.Response(w, http.StatusCreated, output)
 }
 
+// ShowAccount godoc
+// @Summary      Get active list
+// @Description  Get active list
+// @Tags         lists
+// @Accept       json
+// @Produce      json
+// @Success      200  {object} models.ListDTO
+// @Failure      404  {object}  models.ErrorMapDTO
+// @Failure      500
+// @Router       /api/lists/active [get]
 func (h *Handler) GetActive(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value("ID").(int64)
 	list, err := h.repos.ListsRepoImpl.GetActive(userID)
@@ -90,6 +110,16 @@ func (h *Handler) GetActive(w http.ResponseWriter, r *http.Request) {
 	utils.Response(w, http.StatusOK, output)
 }
 
+// ShowAccount godoc
+// @Summary      Update active list name
+// @Description  Update active list name
+// @Tags         lists
+// @Accept       json
+// @Produce      json
+// @Success      200
+// @Failure      400  {object}  models.ErrorMapDTO
+// @Failure      500
+// @Router       /api/lists/name [patch]
 func (h *Handler) UpdateActiveListName(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value("ID").(int64)
 	lang := r.Header.Get("Accept-Language")
@@ -123,12 +153,23 @@ func (h *Handler) UpdateActiveListName(w http.ResponseWriter, r *http.Request) {
 	utils.Response(w, http.StatusOK, nil)
 }
 
+// ShowAccount godoc
+// @Summary      Add item to active list
+// @Description  Add item to active list
+// @Tags         lists
+// @Accept       json
+// @Produce      json
+// @param selectedItem body models.AddSelectedItemDTO true "item to add to the active list"
+// @Success      200 {object} models.Created
+// @Failure      400  {object}  models.ErrorMapDTO
+// @Failure      500
+// @Router       /api/lists/add-item [post]
 func (h *Handler) AddItemToList(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value("ID").(int64)
 	lang := r.Header.Get("Accept-Language")
 	locales := appi18n.GetLocales(lang)
 
-	var item models.SelectedItem
+	var item models.AddSelectedItemDTO
 	err := json.NewDecoder(r.Body).Decode(&item)
 	if err != nil {
 		h.app.Loggers.Error.Println(err.Error())
@@ -175,12 +216,24 @@ func (h *Handler) AddItemToList(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		h.app.Loggers.Error.Println(err.Error())
 	}
-
-	res := map[string]interface{}{"insertedID": insertedID}
+	res := models.Created{
+		InsertedID: insertedID,
+	}
 	output, _ := json.Marshal(res)
 	utils.Response(w, http.StatusOK, output)
 }
 
+// ShowAccount godoc
+// @Summary      Update item in active list
+// @Description  Update item in active list
+// @Tags         lists
+// @Accept       json
+// @Produce      json
+// @param selectedItem body models.UpdateSelItemDTO true "update an item in the active list"
+// @Success      200
+// @Failure      400  {object}  models.ErrorMapDTO
+// @Failure      500
+// @Router       /api/lists/update-items [patch]
 func (h *Handler) UpdateItemsSelected(w http.ResponseWriter, r *http.Request) {
 	lang := r.Header.Get("Accept-Language")
 	locales := appi18n.GetLocales(lang)
@@ -217,13 +270,23 @@ func (h *Handler) UpdateItemsSelected(w http.ResponseWriter, r *http.Request) {
 	utils.Response(w, http.StatusOK, nil)
 }
 
+// ShowAccount godoc
+// @Summary      Delete item in active list
+// @Description  Delete item in active list
+// @Tags         lists
+// @Accept       json
+// @Produce      json
+// @param selectedItem body models.ItemSelIDDTO true "id from item to delete"
+// @Success      200
+// @Failure      400  {object}  models.ErrorMapDTO
+// @Failure      404  {object}  models.ErrorMapDTO
+// @Failure      500
+// @Router       /api/lists/selected-items [delete]
 func (h *Handler) DeleteItemFromList(w http.ResponseWriter, r *http.Request) {
 	lang := r.Header.Get("Accept-Language")
 	locales := appi18n.GetLocales(lang)
 
-	body := struct {
-		ItemSelID int64 `json:"item_sel_id"`
-	}{}
+	var body models.ItemSelIDDTO
 	err := json.NewDecoder(r.Body).Decode(&body)
 	if err != nil {
 		h.app.Loggers.Error.Println(err.Error())
@@ -253,13 +316,23 @@ func (h *Handler) DeleteItemFromList(w http.ResponseWriter, r *http.Request) {
 	utils.Response(w, http.StatusOK, nil)
 }
 
+// ShowAccount godoc
+// @Summary      Completes a item in active list
+// @Description  Completes a item in active list
+// @Tags         lists
+// @Accept       json
+// @Produce      json
+// @param 		selectedItem body models.ItemSelIDDTO true "id from item to complete"
+// @Success      200
+// @Failure      400  {object}  models.ErrorMapDTO
+// @Failure      404  {object}  models.ErrorMapDTO
+// @Failure      500
+// @Router       /api/lists/selected-items [put]
 func (h *Handler) CompleteItemSelected(w http.ResponseWriter, r *http.Request) {
 	lang := r.Header.Get("Accept-Language")
 	locales := appi18n.GetLocales(lang)
 
-	body := struct {
-		ItemSelID int64 `json:"item_sel_id"`
-	}{}
+	var body models.ItemSelIDDTO
 	err := json.NewDecoder(r.Body).Decode(&body)
 	if err != nil {
 		h.app.Loggers.Error.Println(err.Error())
@@ -289,6 +362,16 @@ func (h *Handler) CompleteItemSelected(w http.ResponseWriter, r *http.Request) {
 	utils.Response(w, http.StatusOK, nil)
 }
 
+// ShowAccount godoc
+// @Summary      Cancel the active list
+// @Description  Cancel the active list
+// @Tags         lists
+// @Accept       json
+// @Produce      json
+// @Success      200
+// @Failure      404  {object}  models.ErrorMapDTO
+// @Failure      500
+// @Router       /api/lists/cancel-active [delete]
 func (h *Handler) CancelActive(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value("ID").(int64)
 	lang := r.Header.Get("Accept-Language")
@@ -306,6 +389,16 @@ func (h *Handler) CancelActive(w http.ResponseWriter, r *http.Request) {
 	utils.Response(w, http.StatusOK, nil)
 }
 
+// ShowAccount godoc
+// @Summary      Completes the active list
+// @Description  Completes the active list
+// @Tags         lists
+// @Accept       json
+// @Produce      json
+// @Success      200
+// @Failure      404  {object}  models.ErrorMapDTO
+// @Failure      500
+// @Router       /api/lists/complete-active [patch]
 func (h *Handler) CompleteActive(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value("ID").(int64)
 	lang := r.Header.Get("Accept-Language")
@@ -323,6 +416,15 @@ func (h *Handler) CompleteActive(w http.ResponseWriter, r *http.Request) {
 	utils.Response(w, http.StatusOK, nil)
 }
 
+// ShowAccount godoc
+// @Summary      Get old list
+// @Description  Get old list
+// @Tags         lists
+// @Accept       json
+// @Produce      json
+// @Success      200 {array} models.OldListDTO
+// @Failure      500
+// @Router       /api/lists/old-lists [get]
 func (h *Handler) GetOldLists(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value("ID").(int64)
 	_ = r.Header.Get("Accept-Language")
@@ -343,6 +445,17 @@ func (h *Handler) GetOldLists(w http.ResponseWriter, r *http.Request) {
 	utils.Response(w, http.StatusOK, output)
 }
 
+// ShowAccount godoc
+// @Summary      Get list by id
+// @Description  Get list by id
+// @Tags         lists
+// @Accept       json
+// @Param        listID    path     string  true  "list ID"
+// @Produce      json
+// @Success      200 {object} models.ListDTO
+// @Failure      400  {object}  models.ErrorMapDTO
+// @Failure      500
+// @Router       /api/lists/{listId} [get]
 func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) {
 	lang := r.Header.Get("Accept-Language")
 	locales := appi18n.GetLocales(lang)
