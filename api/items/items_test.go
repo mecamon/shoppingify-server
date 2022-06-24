@@ -36,6 +36,11 @@ var itemsTests = []struct {
 }
 
 func TestItemDom_ValidItem(t *testing.T) {
+	err := appi18n.InitLocales()
+	if err != nil {
+		t.Error(err.Error())
+	}
+
 	for _, tt := range itemsTests {
 		t.Log(tt.testName)
 		{

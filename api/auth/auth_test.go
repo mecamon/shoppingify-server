@@ -4,6 +4,7 @@
 package auth
 
 import (
+	appi18n "github.com/mecamon/shoppingify-server/i18n"
 	"github.com/mecamon/shoppingify-server/models"
 	"testing"
 )
@@ -29,6 +30,10 @@ var validCredTests = []struct {
 }
 
 func TestValidCredentials(t *testing.T) {
+	err := appi18n.InitLocales()
+	if err != nil {
+		t.Error(err.Error())
+	}
 	for _, tt := range validCredTests {
 		t.Log(tt.name)
 		valid, errMap := validCredentials(tt.auth, "en-EN")

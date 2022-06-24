@@ -9,6 +9,7 @@ import (
 	"github.com/mecamon/shoppingify-server/api/repositories"
 	"github.com/mecamon/shoppingify-server/config"
 	"github.com/mecamon/shoppingify-server/db"
+	appi18n "github.com/mecamon/shoppingify-server/i18n"
 	"github.com/mecamon/shoppingify-server/models"
 	"net/http"
 	"os"
@@ -27,6 +28,11 @@ func TestMain(m *testing.M) {
 func setup() *sql.DB {
 	config.Set()
 	appConfig := config.Get()
+
+	err := appi18n.InitLocales()
+	if err != nil {
+		panic(err.Error())
+	}
 
 	conn, err := db.InitDB(appConfig)
 	if err != nil {

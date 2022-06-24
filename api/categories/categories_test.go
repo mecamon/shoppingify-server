@@ -32,6 +32,11 @@ var validCategoryTests = []struct {
 }
 
 func TestCategories_ValidCategory(t *testing.T) {
+	err := appi18n.InitLocales()
+	if err != nil {
+		t.Error(err.Error())
+	}
+
 	for _, tt := range validCategoryTests {
 		t.Log(tt.testName)
 		{

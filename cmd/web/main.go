@@ -4,6 +4,7 @@ import (
 	"github.com/mecamon/shoppingify-server/api/repositories"
 	"github.com/mecamon/shoppingify-server/config"
 	"github.com/mecamon/shoppingify-server/db"
+	appi18n "github.com/mecamon/shoppingify-server/i18n"
 	"github.com/mecamon/shoppingify-server/services/storage"
 	"log"
 	"net/http"
@@ -20,6 +21,11 @@ func main() {
 func run() {
 	config.Set()
 	conf := config.Get()
+
+	err := appi18n.InitLocales()
+	if err != nil {
+		panic(err)
+	}
 
 	conn, err := db.InitDB(conf)
 	if err != nil {

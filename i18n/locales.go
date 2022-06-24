@@ -5,16 +5,19 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"golang.org/x/text/language"
-	"log"
 )
 
+var multiLocales *[]AppLocales
+
 type AppLocales struct {
-	Localizer *i18n.Localizer
+	Lang    string
+	Locales *i18n.Localizer
 }
 
-func GetLocales(lang string) AppLocales {
+func InitLocales() error {
 	var enPath string
 	var bundle *i18n.Bundle
+	var localesSlice []AppLocales
 
 	if flag.Lookup("test.v") == nil {
 		enPath = "./i18n/catalog/active.en.toml"
@@ -22,28 +25,35 @@ func GetLocales(lang string) AppLocales {
 		enPath = "../../i18n/catalog/active.en.toml"
 	}
 
-	switch lang {
-	case "en-EN":
-		bundle = i18n.NewBundle(language.English)
-		bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
-		_, err := bundle.LoadMessageFile(enPath)
-		if err != nil {
-			log.Println(err)
-		}
-	default:
-		bundle = i18n.NewBundle(language.English)
-		bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
-		_, err := bundle.LoadMessageFile(enPath)
-		if err != nil {
-			log.Println(err)
-		}
+	//English built
+	bundle = i18n.NewBundle(language.English)
+	bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
+	_, err := bundle.LoadMessageFile(enPath)
+	if err != nil {
+		return err
 	}
 
-	return AppLocales{i18n.NewLocalizer(bundle, lang)}
+	localesSlice = append(localesSlice, AppLocales{
+		Lang:    "en-EN",
+		Locales: i18n.NewLocalizer(bundle, "en-EN"),
+	})
+
+	multiLocales = &localesSlice
+	
+	return nil
+}
+
+func GetLocales(lang string) AppLocales {
+	for _, appLocales := range *multiLocales {
+		if appLocales.Lang == lang {
+			return appLocales
+		}
+	}
+	return (*multiLocales)[0]
 }
 
 func (a *AppLocales) GetMsg(messageId string, tempData map[string]interface{}) string {
-	msg := a.Localizer.MustLocalize(&i18n.LocalizeConfig{
+	msg := a.Locales.MustLocalize(&i18n.LocalizeConfig{
 		MessageID:    messageId,
 		TemplateData: tempData,
 	})

@@ -4,11 +4,17 @@
 package top_items
 
 import (
+	appi18n "github.com/mecamon/shoppingify-server/i18n"
 	"github.com/mecamon/shoppingify-server/models"
 	"testing"
 )
 
 func TestAddPercentages(t *testing.T) {
+	err := appi18n.InitLocales()
+	if err != nil {
+		t.Error(err.Error())
+	}
+
 	topItems := []models.TopItemDTO{
 		{ID: 1, ItemID: 3, Name: "Cat 1", SumQuantity: 3},
 		{ID: 2, ItemID: 1, Name: "Cat 2", SumQuantity: 3},

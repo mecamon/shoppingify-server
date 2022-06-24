@@ -38,6 +38,11 @@ var validItemToAddTests = []struct {
 }
 
 func TestDomLists_validateItemToAdd(t *testing.T) {
+	err := appi18n.InitLocales()
+	if err != nil {
+		t.Error(err.Error())
+	}
+
 	for _, tt := range validItemToAddTests {
 		t.Log(tt.testName)
 		domLists := DomLists{
