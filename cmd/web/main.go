@@ -8,6 +8,7 @@ import (
 	"github.com/mecamon/shoppingify-server/services/storage"
 	"log"
 	"net/http"
+	"os"
 )
 
 // @title shoppingify-server APIs
@@ -41,7 +42,12 @@ func run() {
 
 	router := makeRouter()
 
-	err = http.ListenAndServe(":8080", router)
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	log.Println("running on port 8080...")
+	err = http.ListenAndServe(":"+port, router)
 	if err != nil {
 		log.Fatal("Could not start server", router)
 	}
