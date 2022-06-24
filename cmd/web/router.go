@@ -42,7 +42,13 @@ func makeRouter() http.Handler {
 	r.Mount("/api/top-items", top_items.Routes())
 
 	// Documenting the api
-	r.Get("/swagger/*", httpSwagger.Handler(httpSwagger.URL("http://localhost:8080/swagger/doc.json")))
+	var domain string
+	if appConfig.IsProd {
+		domain = "https://shoppingify-be.onrender.com"
+	} else {
+		domain = "http://localhost:8080"
+	}
+	r.Get("/swagger/*", httpSwagger.Handler(httpSwagger.URL(domain+"/swagger/doc.json")))
 
 	return r
 }

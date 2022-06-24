@@ -6,6 +6,7 @@ import (
 )
 
 type App struct {
+	IsProd           bool
 	Loggers          *loggers.CustomLoggers
 	DBHost           string
 	DBPort           string
@@ -22,6 +23,7 @@ var conf = App{}
 
 func Set() {
 	conf.Loggers = loggers.Init()
+	flag.BoolVar(&conf.IsProd, "is-prod", true, "Production version")
 	flag.StringVar(&conf.DBHost, "db-host", "test-database", "DB host")
 	flag.StringVar(&conf.DBPort, "db-port", "5432", "Port on which runs the db")
 	flag.StringVar(&conf.DBUser, "db-user", "developer", "Database's username")
