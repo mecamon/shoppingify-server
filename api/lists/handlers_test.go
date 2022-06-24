@@ -259,20 +259,14 @@ func TestHandler_DeleteItemFromList(t *testing.T) {
 		selItemID          int64
 		expectedStatusCode int
 	}{
-		{testName: "required-field", selItemID: 0, expectedStatusCode: http.StatusBadRequest},
 		{testName: "not-saved-item", selItemID: 899, expectedStatusCode: http.StatusNotFound},
 		{testName: "valid-request", selItemID: insertedItemToListID, expectedStatusCode: http.StatusOK},
 	}
 
 	for _, tt := range testsDeleteItemFromList {
 		t.Log(tt.testName)
-		body := models.ItemSelIDDTO{ItemSelID: tt.selItemID}
-		marshalled, err := json.Marshal(body)
-		if err != nil {
-			t.Error(err.Error())
-		}
 		rr := httptest.NewRecorder()
-		req := httptest.NewRequest(http.MethodDelete, "/api/lists/selected-items", bytes.NewReader(marshalled))
+		req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/api/lists/selected-items/%d", tt.selItemID), nil)
 		req.Header.Set("Accept-Language", "en-EN")
 		req.Header.Set("Authorization", tokenForTests)
 

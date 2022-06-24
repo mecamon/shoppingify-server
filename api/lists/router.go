@@ -14,7 +14,7 @@ func Routes() http.Handler {
 	listsRouter.Patch("/name", handler.UpdateActiveListName)
 	listsRouter.Post("/add-item", handler.AddItemToList)
 	listsRouter.Patch("/update-items", handler.UpdateItemsSelected)
-	listsRouter.Delete("/selected-items", handler.DeleteItemFromList)
+	listsRouter.Delete("/selected-items/{itemID}", handler.DeleteItemFromList)
 	listsRouter.Put("/selected-items", handler.CompleteItemSelected)
 	listsRouter.Delete("/cancel-active", handler.CancelActive)
 	listsRouter.Patch("/complete-active", handler.CompleteActive)

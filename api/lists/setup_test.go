@@ -49,7 +49,7 @@ func setup() *sql.DB {
 	if err != nil {
 		panic(err.Error())
 	}
-	
+
 	conn, err := db.InitDB(appConfig)
 	if err != nil {
 		log.Println(err.Error())
@@ -63,7 +63,7 @@ func setup() *sql.DB {
 	r.Patch("/api/lists/name", listsHandler.UpdateActiveListName)
 	r.Post("/api/lists/add-item", listsHandler.AddItemToList)
 	r.Patch("/api/lists/update-items", listsHandler.UpdateItemsSelected)
-	r.Delete("/api/lists/selected-items", listsHandler.DeleteItemFromList)
+	r.Delete("/api/lists/selected-items/{itemID}", listsHandler.DeleteItemFromList)
 	r.Put("/api/lists/selected-items", listsHandler.CompleteItemSelected)
 	r.Delete("/api/lists/cancel-active", listsHandler.CancelActive)
 	r.Patch("/api/lists/complete-active", listsHandler.CompleteActive)

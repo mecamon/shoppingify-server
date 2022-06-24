@@ -286,27 +286,13 @@ func (h *Handler) DeleteItemFromList(w http.ResponseWriter, r *http.Request) {
 	lang := r.Header.Get("Accept-Language")
 	locales := appi18n.GetLocales(lang)
 
-	var body models.ItemSelIDDTO
-	err := json.NewDecoder(r.Body).Decode(&body)
-	if err != nil {
-		h.app.Loggers.Error.Println(err.Error())
-		utils.Response(w, http.StatusNotAcceptable, nil)
-		return
-	}
+	itemIDStr := chi.URLParam(r, "itemID")
+	itemID, err := strconv.ParseInt(itemIDStr, 10, 64)
 
-	if body.ItemSelID == 0 {
-		td := map[string]interface{}{"Field": "item_sel_id"}
-		msg := locales.GetMsg("RequiredField", td)
-		errMap := models.ErrorMap{"idRequired": msg}
-		output, _ := json.Marshal(errMap)
-		utils.Response(w, http.StatusBadRequest, output)
-		return
-	}
-
-	err = h.repos.ListsRepoImpl.DeleteItemFromList(body.ItemSelID)
+	err = h.repos.ListsRepoImpl.DeleteItemFromList(itemID)
 	if err != nil {
 		h.app.Loggers.Info.Println(err.Error())
-		td := map[string]interface{}{"Item": body.ItemSelID}
+		td := map[string]interface{}{"Item": itemID}
 		msg := locales.GetMsg("DoesNotExist", td)
 		errMap := models.ErrorMap{"item": msg}
 		output, _ := json.Marshal(errMap)
