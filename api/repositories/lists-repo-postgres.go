@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/mecamon/shoppingify-server/config"
 	"github.com/mecamon/shoppingify-server/models"
+	"log"
 	"strings"
 	"time"
 )
@@ -76,6 +77,7 @@ func (r *ListsRepoPostgres) UpdateActiveListName(userID int64, name string) erro
 }
 
 func (r *ListsRepoPostgres) GetActive(userID int64) (models.ListDTO, error) {
+	log.Println("REPO----USER ID:", userID)
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 

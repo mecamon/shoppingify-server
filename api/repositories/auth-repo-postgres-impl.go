@@ -47,10 +47,10 @@ func (r *AuthRepoPostgres) Register(user models.User) (int64, error) {
 
 func (r *AuthRepoPostgres) SearchUserByEmail(email string) (models.User, error) {
 	user := models.User{}
-	query := `SELECT name, lastname, email FROM users WHERE email=$1`
+	query := `SELECT id, name, lastname, email FROM users WHERE email=$1`
 	row := r.Conn.QueryRow(query, email)
 
-	err := row.Scan(&user.Name, &user.Lastname, &user.Email)
+	err := row.Scan(&user.ID, &user.Name, &user.Lastname, &user.Email)
 	if err != nil {
 		return user, err
 	}

@@ -8,6 +8,7 @@ import (
 	appi18n "github.com/mecamon/shoppingify-server/i18n"
 	"github.com/mecamon/shoppingify-server/models"
 	"github.com/mecamon/shoppingify-server/utils"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -101,6 +102,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 // @Router       /api/lists/active [get]
 func (h *Handler) GetActive(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value("ID").(int64)
+	log.Println("HANDLER----USER ID:", userID)
 	list, err := h.repos.ListsRepoImpl.GetActive(userID)
 	if err != nil {
 		utils.Response(w, http.StatusNotFound, nil)
@@ -276,12 +278,12 @@ func (h *Handler) UpdateItemsSelected(w http.ResponseWriter, r *http.Request) {
 // @Tags         lists
 // @Accept       json
 // @Produce      json
-// @param selectedItem body models.ItemSelIDDTO true "id from item to delete"
+// @Param        itemID    path     string  true  "item ID"
 // @Success      200
 // @Failure      400  {object}  models.ErrorMapDTO
 // @Failure      404  {object}  models.ErrorMapDTO
 // @Failure      500
-// @Router       /api/lists/selected-items [delete]
+// @Router       /api/lists/selected-items/{itemID} [delete]
 func (h *Handler) DeleteItemFromList(w http.ResponseWriter, r *http.Request) {
 	lang := r.Header.Get("Accept-Language")
 	locales := appi18n.GetLocales(lang)
