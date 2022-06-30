@@ -45,7 +45,6 @@ func (s *Cloudinary) UploadImage(file interface{}, filename string) (string, err
 	if err != nil {
 		return "", err
 	}
-
 	return uploadResult.SecureURL, nil
 }
 

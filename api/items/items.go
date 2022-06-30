@@ -73,6 +73,7 @@ func (m *ItemDom) completedItemInfo() models.Item {
 		Name:       m.item.Name,
 		Note:       m.item.Note,
 		CategoryID: m.item.CategoryID,
+		ImageURL:   m.item.ImageURL,
 		CreatedAt:  time.Now().Unix(),
 		UpdatedAt:  time.Now().Unix(),
 	}
