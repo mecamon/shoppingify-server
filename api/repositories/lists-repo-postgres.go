@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"github.com/mecamon/shoppingify-server/config"
 	"github.com/mecamon/shoppingify-server/models"
-	"log"
 	"strings"
 	"time"
 )
@@ -77,7 +76,6 @@ func (r *ListsRepoPostgres) UpdateActiveListName(userID int64, name string) erro
 }
 
 func (r *ListsRepoPostgres) GetActive(userID int64) (models.ListDTO, error) {
-	log.Println("REPO----USER ID:", userID)
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -102,9 +100,10 @@ func (r *ListsRepoPostgres) GetActive(userID int64) (models.ListDTO, error) {
 	var items []models.SelectedItemDTO
 
 	query2 := `
-			SELECT i_sel.id, i_sel.quantity, i.name, i.id 
+			SELECT i_sel.id, i_sel.quantity, i_sel.is_completed, i.name, i.id, c.id, c.name
 			FROM items_selected AS i_sel 
 			INNER JOIN items AS i ON i_sel.item_id=i.id
+			INNER JOIN categories c ON i.category_id=c.id
 			WHERE i_sel.list_id=$1
     	`
 	rows, err := tx.QueryContext(ctx, query2, listID)
@@ -115,7 +114,14 @@ func (r *ListsRepoPostgres) GetActive(userID int64) (models.ListDTO, error) {
 
 	for rows.Next() {
 		item := models.SelectedItemDTO{}
-		err := rows.Scan(&item.ID, &item.Quantity, &item.Name, &item.ItemID)
+		err := rows.Scan(
+			&item.ID,
+			&item.Quantity,
+			&item.IsCompleted,
+			&item.Name,
+			&item.ItemID,
+			&item.CategoryID,
+			&item.CategoryName)
 		if err != nil {
 			return list, nil
 		}

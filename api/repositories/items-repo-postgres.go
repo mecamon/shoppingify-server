@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"github.com/mecamon/shoppingify-server/config"
 	"github.com/mecamon/shoppingify-server/models"
 	"time"
@@ -29,10 +30,11 @@ func (i *ItemsRepoPostgres) Register(item models.Item) (int64, error) {
 		   note, 
 		   category_id, 
 		   image_url, 
+		   is_active,
 		   created_at, 
 		   updated_at
 	    ) 
-		VALUES ($1, $2, $3, $4, $5, $6) 
+		VALUES ($1, $2, $3, $4, $5, $6, $7) 
 		RETURNING ID`
 
 	var ID int64
@@ -42,6 +44,7 @@ func (i *ItemsRepoPostgres) Register(item models.Item) (int64, error) {
 		item.Note,
 		item.CategoryID,
 		item.ImageURL,
+		item.IsActive,
 		item.CreatedAt,
 		item.UpdatedAt,
 	).Scan(&ID)
@@ -56,7 +59,13 @@ func (i *ItemsRepoPostgres) GetAll(take, skip int) ([]models.ItemDTO, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 4*time.Second)
 	defer cancel()
 
-	stmt := `SELECT id, name, note, image_url FROM items LIMIT $1 OFFSET $2`
+	stmt := `
+		SELECT i.id, i.name, c.id 
+		FROM items as i
+		INNER JOIN categories c
+		ON i.category_id=c.id
+		WHERE i.is_active=true 
+		LIMIT $1 OFFSET $2`
 	rows, err := i.Conn.QueryContext(ctx, stmt, take, skip)
 	if err != nil {
 		return nil, err
@@ -67,7 +76,7 @@ func (i *ItemsRepoPostgres) GetAll(take, skip int) ([]models.ItemDTO, error) {
 
 	for rows.Next() {
 		var item models.ItemDTO
-		err := rows.Scan(&item.ID, &item.Name, &item.Note, &item.ImageURL)
+		err := rows.Scan(&item.ID, &item.Name, &item.CategoryID)
 		if err != nil {
 			return nil, err
 		}
@@ -87,8 +96,13 @@ func (i *ItemsRepoPostgres) GetByID(itemID int64) (models.ItemDTO, error) {
 
 	var item models.ItemDTO
 
-	stmt := `SELECT id, name, note, image_url, category_id FROM items WHERE items.id=$1`
-	err := i.Conn.QueryRowContext(ctx, stmt, itemID).Scan(&item.ID, &item.Name, &item.Note, &item.ImageURL, &item.CategoryID)
+	stmt := `
+		SELECT i.id, i.name, c.id 
+		FROM items AS i 
+		INNER JOIN categories c
+		ON i.category_id=c.id
+		WHERE i.id=$1`
+	err := i.Conn.QueryRowContext(ctx, stmt, itemID).Scan(&item.ID, &item.Name, &item.CategoryID)
 	if err != nil {
 		return item, err
 	}
@@ -101,7 +115,12 @@ func (i *ItemsRepoPostgres) GetAllByCategoryID(categoryID int64) ([]models.ItemD
 
 	var items []models.ItemDTO
 
-	query := `SELECT id, name, note, image_url FROM items WHERE items.category_id=$1`
+	query := `
+		SELECT i.id, i.name, c.id 
+		FROM items AS i
+		INNER JOIN categories c
+		ON i.category_id=c.id
+		WHERE i.category_id=$1 AND is_active=true`
 	rows, err := i.Conn.QueryContext(ctx, query, categoryID)
 	defer rows.Close()
 	if err != nil {
@@ -110,7 +129,7 @@ func (i *ItemsRepoPostgres) GetAllByCategoryID(categoryID int64) ([]models.ItemD
 
 	for rows.Next() {
 		var item models.ItemDTO
-		err := rows.Scan(&item.ID, &item.Name, &item.Note, &item.ImageURL)
+		err := rows.Scan(&item.ID, &item.Name, &item.CategoryID)
 		if err != nil {
 			return items, err
 		}
@@ -129,7 +148,7 @@ func (i *ItemsRepoPostgres) Count() (int64, error) {
 
 	var count int64
 
-	query := `SELECT COUNT(*) FROM items`
+	query := `SELECT COUNT(*) FROM items WHERE is_active=true`
 	err := i.Conn.QueryRowContext(ctx, query).Scan(&count)
 	if err != nil {
 		return 0, err
@@ -137,16 +156,45 @@ func (i *ItemsRepoPostgres) Count() (int64, error) {
 	return count, nil
 }
 
-func (i *ItemsRepoPostgres) GetDetails(id int64) (models.ItemDTO, error) {
+func (i *ItemsRepoPostgres) GetDetails(id int64) (models.ItemDetailedDTO, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	var item models.ItemDTO
+	var item models.ItemDetailedDTO
 
-	query := `SELECT id, name, note, image_url FROM items WHERE id=$1`
-	err := i.Conn.QueryRowContext(ctx, query, id).Scan(&item.ID, &item.Name, &item.Note, &item.ImageURL)
+	query := `
+		SELECT i.id, i.name, c.name, i.note, i.image_url 
+		FROM items AS i
+		INNER JOIN categories c
+		ON i.category_id=c.id
+		WHERE i.id=$1`
+	err := i.Conn.QueryRowContext(ctx, query, id).Scan(
+		&item.ID,
+		&item.Name,
+		&item.CategoryName,
+		&item.Note,
+		&item.ImageURL)
 	if err != nil {
 		return item, err
 	}
 	return item, nil
+}
+
+func (i *ItemsRepoPostgres) Disable(id int64) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `UPDATE items SET is_active=false WHERE id=$1`
+	result, err := i.Conn.ExecContext(ctx, query, id)
+	if err != nil {
+		return err
+	}
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rows == 0 {
+		return errors.New("0 rows affected")
+	}
+	return nil
 }

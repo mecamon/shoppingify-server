@@ -166,6 +166,7 @@ func TestListsRepoPostgres_AddItemToList_Success(t *testing.T) {
 		Note:       "This is a note",
 		CategoryID: insertedCategoryID,
 		ImageURL:   "",
+		IsActive:   true,
 		CreatedAt:  time.Now().Unix(),
 		UpdatedAt:  time.Now().Unix(),
 	}

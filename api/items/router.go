@@ -12,5 +12,6 @@ func Routes() http.Handler {
 	itemsHandler.Post("/", handler.Create)
 	itemsHandler.Get("/", handler.GetByCategoryGroups)
 	itemsHandler.Get("/{id}", handler.GetDetailsByID)
+	itemsHandler.Delete("/{id}", handler.Delete)
 	return itemsHandler
 }

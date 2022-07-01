@@ -30,6 +30,7 @@ type Item struct {
 	Name       string `json:"name"`
 	Note       string `json:"note"`
 	CategoryID int64  `json:"category_id"`
+	IsActive   bool   `json:"is_active"`
 	ImageURL   string `json:"image_url"`
 	CreatedAt  int64  `json:"created_at"`
 	UpdatedAt  int64  `json:"updated_at"`
@@ -38,9 +39,16 @@ type Item struct {
 type ItemDTO struct {
 	ID         int64  `json:"id"`
 	Name       string `json:"name"`
-	Note       string `json:"note"`
-	ImageURL   string `json:"image_url"`
 	CategoryID int64  `json:"category_id"`
+}
+
+type ItemDetailedDTO struct {
+	ID           int64  `json:"id"`
+	Name         string `json:"name"`
+	CategoryName string `json:"category_name"`
+	Note         string `json:"note"`
+	ImageURL     string `json:"image_url"`
+	CategoryID   int64  `json:"category_id"`
 }
 
 type ItemFormDTO struct {
@@ -128,10 +136,13 @@ type AddSelectedItemDTO struct {
 }
 
 type SelectedItemDTO struct {
-	ID       int64  `json:"id"`
-	ItemID   int64  `json:"item_id"`
-	Name     string `json:"name"`
-	Quantity int    `json:"quantity"`
+	ID           int64  `json:"id"`
+	ItemID       int64  `json:"item_id"`
+	Name         string `json:"name"`
+	Quantity     int    `json:"quantity"`
+	IsCompleted  bool   `json:"is_completed"`
+	CategoryID   int64  `json:"category_id"`
+	CategoryName string `json:"category_name"`
 }
 
 type TopCategory struct {

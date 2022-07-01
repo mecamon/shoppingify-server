@@ -8,7 +8,6 @@ import (
 	appi18n "github.com/mecamon/shoppingify-server/i18n"
 	"github.com/mecamon/shoppingify-server/models"
 	"github.com/mecamon/shoppingify-server/utils"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -102,7 +101,6 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 // @Router       /api/lists/active [get]
 func (h *Handler) GetActive(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value("ID").(int64)
-	log.Println("HANDLER----USER ID:", userID)
 	list, err := h.repos.ListsRepoImpl.GetActive(userID)
 	if err != nil {
 		utils.Response(w, http.StatusNotFound, nil)

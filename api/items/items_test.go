@@ -104,7 +104,7 @@ func TestItemDom_CompletedItemInfo(t *testing.T) {
 		fileInfo: FileInfo{},
 	}
 	ci := itemDom.completedItemInfo()
-	if ci.CreatedAt == 0 || ci.UpdatedAt == 0 {
+	if ci.CreatedAt == 0 || ci.UpdatedAt == 0 || !ci.IsActive {
 		t.Error("item is not completed")
 	}
 }

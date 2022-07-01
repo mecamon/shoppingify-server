@@ -1,5 +1,5 @@
-//go:build integration
-// +build integration
+//go:build !integration
+// +build !integration
 
 package items
 
@@ -18,6 +18,8 @@ import (
 )
 
 var Router http.Handler
+var Token string
+var InsertedUserID int64
 
 func TestMain(m *testing.M) {
 	conn := setup()
@@ -34,7 +36,7 @@ func setup() *sql.DB {
 	if err != nil {
 		panic(err.Error())
 	}
-	
+
 	conn, err := db.InitDB(appConfig)
 	if err != nil {
 		log.Println(err.Error())
@@ -46,6 +48,7 @@ func setup() *sql.DB {
 	r.Post("/api/items/", itemsHandler.Create)
 	r.Get("/api/items/", itemsHandler.GetByCategoryGroups)
 	r.Get("/api/items/{id}", itemsHandler.GetDetailsByID)
+	r.Delete("/api/items/{id}", itemsHandler.Delete)
 	Router = r
 
 	return conn

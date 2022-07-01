@@ -113,3 +113,10 @@ func TestItemsRepoPostgres_GetDetails(t *testing.T) {
 		t.Error(err.Error())
 	}
 }
+
+func TestItemsRepoPostgres_Disable(t *testing.T) {
+	err := itemsRepo.Disable(1)
+	if err != nil {
+		t.Error(err.Error())
+	}
+}

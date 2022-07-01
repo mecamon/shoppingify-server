@@ -191,7 +191,7 @@ func (h *Handler) GetByCategoryGroups(w http.ResponseWriter, r *http.Request) {
 // @Accept       json
 // @Param        id    path     string  true  "item ID"
 // @Produce      json
-// @Success      200  {object} models.ItemDTO
+// @Success      200  {object} models.ItemDetailedDTO
 // @Failure      404  {object}  models.ErrorMapDTO
 // @Failure      500
 // @Router       /api/items/{id} [get]
@@ -199,7 +199,7 @@ func (h *Handler) GetDetailsByID(w http.ResponseWriter, r *http.Request) {
 	itemId := strings.TrimPrefix(r.URL.Path, "/api/items/")
 	id, err := strconv.ParseInt(itemId, 10, 64)
 	if err != nil {
-		utils.Response(w, http.StatusNotFound, nil)
+		utils.Response(w, http.StatusBadRequest, nil)
 		return
 	}
 
@@ -215,4 +215,32 @@ func (h *Handler) GetDetailsByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	utils.Response(w, http.StatusOK, output)
+}
+
+// ShowAccount godoc
+// @Summary      Delete an item by id
+// @Description  Delete an item by id
+// @Tags         items
+// @Accept       json
+// @Param        id    path     string  true  "item ID"
+// @Produce      json
+// @Success      200
+// @Failure      404  {object}  models.ErrorMapDTO
+// @Failure      500
+// @Router       /api/items/{id} [delete]
+func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) {
+	itemId := strings.TrimPrefix(r.URL.Path, "/api/items/")
+	id, err := strconv.ParseInt(itemId, 10, 64)
+	if err != nil {
+		utils.Response(w, http.StatusBadRequest, nil)
+		return
+	}
+
+	err = h.repos.ItemsRepoIpml.Disable(id)
+	if err != nil {
+		utils.Response(w, http.StatusNotFound, nil)
+		return
+	}
+
+	utils.Response(w, http.StatusOK, nil)
 }

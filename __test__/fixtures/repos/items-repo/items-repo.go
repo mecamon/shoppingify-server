@@ -47,6 +47,7 @@ var Item1 = models.Item{
 	Name:      "Item 1 item repo",
 	Note:      "Item one note",
 	ImageURL:  "",
+	IsActive:  true,
 	CreatedAt: time.Now().Unix(),
 	UpdatedAt: time.Now().Unix(),
 }
@@ -55,6 +56,7 @@ var Item2 = models.Item{
 	Name:      "Item 2 item repo",
 	Note:      "Item two note",
 	ImageURL:  "",
+	IsActive:  true,
 	CreatedAt: time.Now().Unix(),
 	UpdatedAt: time.Now().Unix(),
 }
@@ -63,6 +65,7 @@ var GenericItem = models.Item{
 	Name:      "Item",
 	Note:      "Item one note",
 	ImageURL:  "",
+	IsActive:  true,
 	CreatedAt: time.Now().Unix(),
 	UpdatedAt: time.Now().Unix(),
 }

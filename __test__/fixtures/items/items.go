@@ -53,6 +53,7 @@ var GenericItem = models.Item{
 	Name:      "ItemForItemGet",
 	Note:      "I am a note",
 	ImageURL:  "",
+	IsActive:  true,
 	CreatedAt: time.Now().Unix(),
 	UpdatedAt: time.Now().Unix(),
 }

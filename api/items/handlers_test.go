@@ -1,5 +1,5 @@
-//go:build integration
-// +build integration
+//go:build !integration
+// +build !integration
 
 package items
 
@@ -18,6 +18,7 @@ import (
 	"net/http/httptest"
 	"strconv"
 	"testing"
+	"time"
 )
 
 var createItemsTests = []struct {
@@ -171,8 +172,6 @@ func TestHandler_GetByCategoryGroups(t *testing.T) {
 	}
 }
 
-var token string
-
 func TestHandler_GetDetailsByID(t *testing.T) {
 	user := fixtures_items.UserForGetOne
 	hashedPass, err := utils.GenerateHash(user.Password)
@@ -181,18 +180,18 @@ func TestHandler_GetDetailsByID(t *testing.T) {
 	}
 	user.Password = hashedPass
 	repos := repositories.Main
-	insertedUserId, err := repos.AuthRepoImpl.Register(user)
+	InsertedUserID, err = repos.AuthRepoImpl.Register(user)
 	if err != nil {
 		t.Error(err.Error())
 	}
-	token, err = json_web_token.Generate(insertedUserId, "")
+	Token, err = json_web_token.Generate(InsertedUserID, "")
 	if err != nil {
 		t.Error(err.Error())
 	}
 
 	rr := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/api/items/1"), nil)
-	req.Header.Set("Authorization", token)
+	req.Header.Set("Authorization", Token)
 	Router.ServeHTTP(rr, req)
 	if rr.Code != http.StatusOK {
 		t.Errorf("expected %d but got %d", http.StatusOK, rr.Code)
@@ -202,7 +201,53 @@ func TestHandler_GetDetailsByID(t *testing.T) {
 func TestHandler_GetDetailsByID2(t *testing.T) {
 	rr := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/items/"+"aa", nil)
-	req.Header.Set("Authorization", token)
+	req.Header.Set("Authorization", Token)
+	Router.ServeHTTP(rr, req)
+	if rr.Code != http.StatusBadRequest {
+		t.Errorf("expected %d but got %d", http.StatusNotFound, rr.Code)
+	}
+}
+
+func TestHandler_Delete(t *testing.T) {
+	repos := repositories.Main
+	cat := models.Category{
+		Name:      "Category for del item",
+		UserID:    InsertedUserID,
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
+	}
+	insertedCatId, err := repos.CategoriesRepoImpl.RegisterCategory(cat)
+	if err != nil {
+		t.Error(err.Error())
+	}
+
+	item := models.Item{
+		Name:       "Item for delete 1",
+		Note:       "This is a note",
+		CategoryID: insertedCatId,
+		IsActive:   true,
+		ImageURL:   "",
+		CreatedAt:  time.Now().Unix(),
+		UpdatedAt:  time.Now().Unix(),
+	}
+	insertedItemID, err := repos.ItemsRepoIpml.Register(item)
+	if err != nil {
+		t.Error(err.Error())
+	}
+
+	rr := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/api/items/%d", insertedItemID), nil)
+	req.Header.Set("Authorization", Token)
+	Router.ServeHTTP(rr, req)
+	if rr.Code != http.StatusOK {
+		t.Errorf("expected %d but got %d", http.StatusOK, rr.Code)
+	}
+}
+
+func TestHandler_Delete2(t *testing.T) {
+	rr := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/api/items/%d", 800), nil)
+	req.Header.Set("Authorization", Token)
 	Router.ServeHTTP(rr, req)
 	if rr.Code != http.StatusNotFound {
 		t.Errorf("expected %d but got %d", http.StatusNotFound, rr.Code)

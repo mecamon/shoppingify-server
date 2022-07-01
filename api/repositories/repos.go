@@ -52,10 +52,11 @@ type CategoriesRepo interface {
 type ItemsRepo interface {
 	Register(item models.Item) (int64, error)
 	GetAll(take, skip int) ([]models.ItemDTO, error)
-	GetDetails(id int64) (models.ItemDTO, error)
+	GetDetails(id int64) (models.ItemDetailedDTO, error)
 	GetByID(itemID int64) (models.ItemDTO, error)
 	GetAllByCategoryID(categoryId int64) ([]models.ItemDTO, error)
 	Count() (int64, error)
+	Disable(id int64) error
 }
 
 type ListsRepo interface {

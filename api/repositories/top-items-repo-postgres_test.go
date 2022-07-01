@@ -31,6 +31,7 @@ func TestTopItemsRepoImpl_Add_Success(t *testing.T) {
 		Note:       "this is a note",
 		CategoryID: categoryIDForTestRepos,
 		ImageURL:   "",
+		IsActive:   true,
 		CreatedAt:  time.Now().Unix(),
 		UpdatedAt:  time.Now().Unix(),
 	})
@@ -56,6 +57,7 @@ func TestTopItemsRepoImpl_Update_Success(t *testing.T) {
 		Note:       "this is a note",
 		CategoryID: categoryIDForTestRepos,
 		ImageURL:   "",
+		IsActive:   true,
 		CreatedAt:  time.Now().Unix(),
 		UpdatedAt:  time.Now().Unix(),
 	})
