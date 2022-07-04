@@ -408,8 +408,44 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.ItemDTO"
+                            "$ref": "#/definitions/models.ItemDetailedDTO"
                         }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMapDTO"
+                        }
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes an item by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "items"
+                ],
+                "summary": "Deletes an item by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "item ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
                     },
                     "404": {
                         "description": "Not Found",
@@ -707,7 +743,9 @@ const docTemplate = `{
                         "description": ""
                     }
                 }
-            },
+            }
+        },
+        "/api/lists/selected-items/{itemID}": {
             "delete": {
                 "description": "Delete item in active list",
                 "consumes": [
@@ -722,13 +760,11 @@ const docTemplate = `{
                 "summary": "Delete item in active list",
                 "parameters": [
                     {
-                        "description": "id from item to delete",
-                        "name": "selectedItem",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.ItemSelIDDTO"
-                        }
+                        "type": "string",
+                        "description": "item ID",
+                        "name": "itemID",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -986,6 +1022,23 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ItemDetailedDTO": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "integer"
+                },
+                "category_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
                 "image_url": {
                     "type": "string"
                 },
@@ -1072,8 +1125,17 @@ const docTemplate = `{
         "models.SelectedItemDTO": {
             "type": "object",
             "properties": {
+                "category_id": {
+                    "type": "integer"
+                },
+                "category_name": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
+                },
+                "is_completed": {
+                    "type": "boolean"
                 },
                 "item_id": {
                     "type": "integer"

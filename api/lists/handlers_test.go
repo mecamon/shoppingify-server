@@ -149,6 +149,11 @@ func TestHandler_AddItemToList(t *testing.T) {
 			Quantity: 3,
 			ListID:   currentActiveListID,
 		}, expectedStatusCode: http.StatusOK},
+		{testName: "duplicate item", itemToAdd: models.SelectedItem{
+			ItemID:   insertedItemID2,
+			Quantity: 3,
+			ListID:   currentActiveListID,
+		}, expectedStatusCode: http.StatusConflict},
 		{testName: "on-cancelled-list", itemToAdd: models.SelectedItem{
 			ItemID:   insertedItemID3,
 			Quantity: 2,
@@ -245,14 +250,42 @@ func TestHandler_UpdateItemsSelected(t *testing.T) {
 }
 
 func TestHandler_DeleteItemFromList(t *testing.T) {
-	insertedItemToListID, _ := repositories.Main.ListsRepoImpl.AddItemToList(models.SelectedItem{
-		ItemID:      insertedItemID2,
+	category := models.Category{
+		Name:      "Cat for del from list 1",
+		UserID:    userIdForTest,
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
+	}
+	insertedCatID, err := repositories.Main.CategoriesRepoImpl.RegisterCategory(category)
+	if err != nil {
+		t.Error(err.Error())
+	}
+
+	item := models.Item{
+		Name:       "item for del list 1",
+		Note:       "item for del list 1",
+		CategoryID: insertedCatID,
+		IsActive:   true,
+		ImageURL:   "",
+		CreatedAt:  time.Now().Unix(),
+		UpdatedAt:  time.Now().Unix(),
+	}
+	insertedItemID, err := repositories.Main.ItemsRepoIpml.Register(item)
+	if err != nil {
+		t.Error(err.Error())
+	}
+
+	insertedItemToListID, err := repositories.Main.ListsRepoImpl.AddItemToList(models.SelectedItem{
+		ItemID:      insertedItemID,
 		Quantity:    1,
 		IsCompleted: false,
 		ListID:      currentActiveListID,
 		CreatedAt:   time.Now().Unix(),
 		UpdatedAt:   time.Now().Unix(),
 	})
+	if err != nil {
+		t.Error(err.Error())
+	}
 
 	var testsDeleteItemFromList = []struct {
 		testName           string
@@ -278,8 +311,33 @@ func TestHandler_DeleteItemFromList(t *testing.T) {
 }
 
 func TestHandler_CompleteItemSelected(t *testing.T) {
+	category := models.Category{
+		Name:      "Cat for del from list 2",
+		UserID:    userIdForTest,
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
+	}
+	insertedCatID, err := repositories.Main.CategoriesRepoImpl.RegisterCategory(category)
+	if err != nil {
+		t.Error(err.Error())
+	}
+
+	item := models.Item{
+		Name:       "item for del list 2",
+		Note:       "item for del list 2",
+		CategoryID: insertedCatID,
+		IsActive:   true,
+		ImageURL:   "",
+		CreatedAt:  time.Now().Unix(),
+		UpdatedAt:  time.Now().Unix(),
+	}
+	insertedItemID, err := repositories.Main.ItemsRepoIpml.Register(item)
+	if err != nil {
+		t.Error(err.Error())
+	}
+
 	insertedItemToListID, _ := repositories.Main.ListsRepoImpl.AddItemToList(models.SelectedItem{
-		ItemID:      insertedItemID2,
+		ItemID:      insertedItemID,
 		Quantity:    1,
 		IsCompleted: false,
 		ListID:      currentActiveListID,

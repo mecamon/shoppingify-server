@@ -199,7 +199,12 @@ func (h *Handler) AddItemToList(w http.ResponseWriter, r *http.Request) {
 			output, _ := json.Marshal(errMap)
 			utils.Response(w, http.StatusBadRequest, output)
 		}
-
+		if strings.Contains(err.Error(), "unique constraint") {
+			msg := locales.GetMsg("ItemAlreadyInList", nil)
+			errMap := models.ErrorMap{"list": msg}
+			output, _ := json.Marshal(errMap)
+			utils.Response(w, http.StatusConflict, output)
+		}
 		return
 	}
 
@@ -229,7 +234,7 @@ func (h *Handler) AddItemToList(w http.ResponseWriter, r *http.Request) {
 // @Tags         lists
 // @Accept       json
 // @Produce      json
-// @param selectedItem body models.UpdateSelItemDTO true "update an item in the active list"
+// @param selectedItem body []models.UpdateSelItemDTO true "update an item in the active list"
 // @Success      200
 // @Failure      400  {object}  models.ErrorMapDTO
 // @Failure      500

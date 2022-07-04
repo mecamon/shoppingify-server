@@ -26,6 +26,10 @@ other = "the category name inserted is already in use"
 description = "Error message for item name duplicated in the same category"
 other = "the item name inserted is already in use in the current category"
 
+[ItemAlreadyInList]
+description = "Error message for item already in list"
+other = "the item is already in the list"
+
 [InvalidEmailOrPassword]
 description = "Error message for bad credentials login"
 one = "wrong email or password"

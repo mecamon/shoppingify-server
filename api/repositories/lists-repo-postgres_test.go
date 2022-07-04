@@ -16,6 +16,7 @@ var (
 	insertedListID         int64
 	insertedItemSelectedID int64
 	userForListRepo        models.User
+	insertedItemID         int64
 )
 
 func TestListsRepoPostgres_Create_Success(t *testing.T) {
@@ -170,7 +171,7 @@ func TestListsRepoPostgres_AddItemToList_Success(t *testing.T) {
 		CreatedAt:  time.Now().Unix(),
 		UpdatedAt:  time.Now().Unix(),
 	}
-	insertedItemID, err := itemsRepo.Register(item)
+	insertedItemID, err = itemsRepo.Register(item)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -186,6 +187,22 @@ func TestListsRepoPostgres_AddItemToList_Success(t *testing.T) {
 	insertedItemSelectedID, err = listsRepo.AddItemToList(itemSelected)
 	if err != nil {
 		t.Error(err.Error())
+	}
+}
+
+func TestListsRepoPostgres_AddItemToList_Error2(t *testing.T) {
+	var err error
+	itemSelected := models.SelectedItem{
+		ItemID:      insertedItemID,
+		Quantity:    3,
+		IsCompleted: false,
+		ListID:      insertedListID,
+		CreatedAt:   time.Now().Unix(),
+		UpdatedAt:   time.Now().Unix(),
+	}
+	_, err = listsRepo.AddItemToList(itemSelected)
+	if err == nil {
+		t.Error("expected error but did not get it")
 	}
 }
 

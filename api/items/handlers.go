@@ -218,8 +218,8 @@ func (h *Handler) GetDetailsByID(w http.ResponseWriter, r *http.Request) {
 }
 
 // ShowAccount godoc
-// @Summary      Delete an item by id
-// @Description  Delete an item by id
+// @Summary      Deletes an item by id
+// @Description  Deletes an item by id
 // @Tags         items
 // @Accept       json
 // @Param        id    path     string  true  "item ID"

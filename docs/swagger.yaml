@@ -59,6 +59,17 @@ definitions:
         type: integer
       id:
         type: integer
+      name:
+        type: string
+    type: object
+  models.ItemDetailedDTO:
+    properties:
+      category_id:
+        type: integer
+      category_name:
+        type: string
+      id:
+        type: integer
       image_url:
         type: string
       name:
@@ -115,8 +126,14 @@ definitions:
     type: object
   models.SelectedItemDTO:
     properties:
+      category_id:
+        type: integer
+      category_name:
+        type: string
       id:
         type: integer
+      is_completed:
+        type: boolean
       item_id:
         type: integer
       name:
@@ -415,6 +432,30 @@ paths:
       tags:
       - items
   /api/items/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes an item by id
+      parameters:
+      - description: item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorMapDTO'
+        "500":
+          description: ""
+      summary: Deletes an item by id
+      tags:
+      - items
     get:
       consumes:
       - application/json
@@ -431,7 +472,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.ItemDTO'
+            $ref: '#/definitions/models.ItemDetailedDTO'
         "404":
           description: Not Found
           schema:
@@ -626,35 +667,6 @@ paths:
       tags:
       - lists
   /api/lists/selected-items:
-    delete:
-      consumes:
-      - application/json
-      description: Delete item in active list
-      parameters:
-      - description: id from item to delete
-        in: body
-        name: selectedItem
-        required: true
-        schema:
-          $ref: '#/definitions/models.ItemSelIDDTO'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ""
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.ErrorMapDTO'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.ErrorMapDTO'
-        "500":
-          description: ""
-      summary: Delete item in active list
-      tags:
-      - lists
     put:
       consumes:
       - application/json
@@ -682,6 +694,35 @@ paths:
         "500":
           description: ""
       summary: Completes a item in active list
+      tags:
+      - lists
+  /api/lists/selected-items/{itemID}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete item in active list
+      parameters:
+      - description: item ID
+        in: path
+        name: itemID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorMapDTO'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorMapDTO'
+        "500":
+          description: ""
+      summary: Delete item in active list
       tags:
       - lists
   /api/lists/update-items:

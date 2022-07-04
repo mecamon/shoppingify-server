@@ -1,0 +1,1 @@
+DROP INDEX items_selected.idx_id_unique_sel_item

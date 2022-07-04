@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX idx_id_unique_sel_item on items_selected(item_id, list_id)
