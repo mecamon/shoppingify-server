@@ -94,7 +94,11 @@ func (t *TopCategoriesRepoImpl) GetAll(userID int64) ([]models.TopCategoryDTO, e
 
 	var topCategories []models.TopCategoryDTO
 
-	query := `SELECT id, category_id, sum_quantity FROM top_categories WHERE user_id=$1`
+	query := `
+		SELECT t.id, t.category_id, t.sum_quantity, c.name 
+		FROM top_categories AS t
+		INNER JOIN categories c ON t.category_id=c.id
+		WHERE t.user_id=$1`
 	rows, err := t.Conn.QueryContext(ctx, query, userID)
 	if err != nil {
 		return topCategories, err
@@ -103,7 +107,7 @@ func (t *TopCategoriesRepoImpl) GetAll(userID int64) ([]models.TopCategoryDTO, e
 
 	for rows.Next() {
 		var cat models.TopCategoryDTO
-		err := rows.Scan(&cat.ID, &cat.CategoryID, &cat.SumQuantity)
+		err := rows.Scan(&cat.ID, &cat.CategoryID, &cat.SumQuantity, &cat.Name)
 		if err != nil {
 			return topCategories, err
 		}

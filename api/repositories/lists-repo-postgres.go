@@ -380,9 +380,10 @@ func (r *ListsRepoPostgres) GetByID(userID, listsId int64) (models.ListDTO, erro
 	var items []models.SelectedItemDTO
 
 	query2 := `
-			SELECT i_sel.id, i_sel.quantity, i.name, i.id 
+			SELECT i_sel.id, i_sel.quantity, i.name, i.id, c.name, c.id 
 			FROM items_selected AS i_sel 
 			INNER JOIN items AS i ON i_sel.item_id=i.id
+			INNER JOIN categories as c ON i.category_id=c.id
 			WHERE i_sel.list_id=$1
     	`
 	rows, err := tx.QueryContext(ctx, query2, listID)
@@ -393,7 +394,7 @@ func (r *ListsRepoPostgres) GetByID(userID, listsId int64) (models.ListDTO, erro
 
 	for rows.Next() {
 		item := models.SelectedItemDTO{}
-		err := rows.Scan(&item.ID, &item.Quantity, &item.Name, &item.ItemID)
+		err := rows.Scan(&item.ID, &item.Quantity, &item.Name, &item.ItemID, &item.CategoryName, &item.CategoryID)
 		if err != nil {
 			return list, nil
 		}

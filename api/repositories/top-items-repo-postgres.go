@@ -93,7 +93,11 @@ func (t *TopItemsRepoImpl) GetAll(userID int64) ([]models.TopItemDTO, error) {
 
 	var topItems []models.TopItemDTO
 
-	query := `SELECT id, item_id, sum_quantity FROM top_items WHERE user_id=$1`
+	query := `
+		SELECT t.id, t.item_id, t.sum_quantity, i.name
+		FROM top_items AS t
+		INNER JOIN items i ON t.item_id=i.id
+		WHERE user_id=$1`
 	rows, err := t.Conn.QueryContext(ctx, query, userID)
 	if err != nil {
 		return topItems, err
@@ -102,7 +106,7 @@ func (t *TopItemsRepoImpl) GetAll(userID int64) ([]models.TopItemDTO, error) {
 
 	for rows.Next() {
 		var item models.TopItemDTO
-		err := rows.Scan(&item.ID, &item.ItemID, &item.SumQuantity)
+		err := rows.Scan(&item.ID, &item.ItemID, &item.SumQuantity, &item.Name)
 		if err != nil {
 			return topItems, err
 		}

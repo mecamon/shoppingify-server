@@ -454,6 +454,7 @@ func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value("ID").(int64)
 	listIDStr := chi.URLParam(r, "listID")
 	listID, err := strconv.ParseInt(listIDStr, 10, 64)
+
 	if err != nil {
 		msg := locales.GetMsg("InvalidRouteParam", nil)
 		errMap := models.ErrorMap{"param": msg}

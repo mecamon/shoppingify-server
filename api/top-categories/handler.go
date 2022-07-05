@@ -44,6 +44,7 @@ func (h *Handler) GetTop(w http.ResponseWriter, r *http.Request) {
 		utils.Response(w, http.StatusInternalServerError, nil)
 		return
 	}
+
 	allCategories, err := h.repos.TopCategoriesImpl.GetAll(userID)
 	if err != nil {
 		h.app.Loggers.Error.Println(err.Error())
@@ -51,6 +52,7 @@ func (h *Handler) GetTop(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	completedCategories := addPercentages(topCategories, allCategories)
+
 	output, err := json.Marshal(completedCategories)
 	if err != nil {
 		h.app.Loggers.Error.Println(err.Error())

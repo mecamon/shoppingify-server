@@ -27,6 +27,9 @@ func TestAddPercentages(t *testing.T) {
 	}
 	topCatsWithPercentages := addPercentages(topCats, allCats)
 
+	if topCatsWithPercentages[0].Name == "" {
+		t.Error("Does not contain name")
+	}
 	if topCatsWithPercentages[0].Percentage != 30 {
 		t.Error("wrong percentage")
 	}
