@@ -35,12 +35,12 @@ func (t TopItemsRepoImpl) Add(userID, itemID int64) (int64, error) {
 	return ID, nil
 }
 
-func (t TopItemsRepoImpl) Update(userID, itemID int64) error {
+func (t TopItemsRepoImpl) Update(userID, itemID int64, quantity int) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	stmt := `UPDATE top_items as t SET sum_quantity=sum_quantity+1 WHERE t.user_id=$1 AND t.item_id=$2`
-	result, err := t.Conn.ExecContext(ctx, stmt, userID, itemID)
+	stmt := `UPDATE top_items as t SET sum_quantity=sum_quantity+$1 WHERE t.user_id=$2 AND t.item_id=$3`
+	result, err := t.Conn.ExecContext(ctx, stmt, quantity, userID, itemID)
 	if err != nil {
 		return err
 	}

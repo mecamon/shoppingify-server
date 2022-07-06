@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX idx_user_id_year_month ON items_summary(user_id, year, month)

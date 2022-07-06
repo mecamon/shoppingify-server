@@ -45,7 +45,7 @@ func TestTopItemsRepoImpl_Add_Success(t *testing.T) {
 }
 
 func TestTopItemsRepoImpl_Update_Error(t *testing.T) {
-	err := topItemsRepo.Update(userIdForTestRepos, 87645)
+	err := topItemsRepo.Update(userIdForTestRepos, 87645, 98)
 	if err == nil {
 		t.Error("expected an error but did not get it")
 	}
@@ -68,7 +68,7 @@ func TestTopItemsRepoImpl_Update_Success(t *testing.T) {
 	if err != nil {
 		t.Error(err.Error())
 	}
-	err = topItemsRepo.Update(userIdForTestRepos, insertedID)
+	err = topItemsRepo.Update(userIdForTestRepos, insertedID, 32)
 	if err != nil {
 		t.Error(err.Error())
 	}

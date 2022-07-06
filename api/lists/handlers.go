@@ -165,7 +165,6 @@ func (h *Handler) UpdateActiveListName(w http.ResponseWriter, r *http.Request) {
 // @Failure      500
 // @Router       /api/lists/add-item [post]
 func (h *Handler) AddItemToList(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("ID").(int64)
 	lang := r.Header.Get("Accept-Language")
 	locales := appi18n.GetLocales(lang)
 
@@ -208,19 +207,6 @@ func (h *Handler) AddItemToList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//Updating tops information
-	err = h.repos.TopItemsImpl.Update(userID, completedItem.ItemID)
-	if err != nil {
-		h.app.Loggers.Error.Println(err.Error())
-	}
-	itemInfo, err := h.repos.ItemsRepoIpml.GetByID(completedItem.ItemID)
-	if err != nil {
-		h.app.Loggers.Error.Println(err.Error())
-	}
-	err = h.repos.TopCategoriesImpl.Update(userID, itemInfo.CategoryID)
-	if err != nil {
-		h.app.Loggers.Error.Println(err.Error())
-	}
 	res := models.Created{
 		InsertedID: insertedID,
 	}
@@ -395,7 +381,14 @@ func (h *Handler) CompleteActive(w http.ResponseWriter, r *http.Request) {
 	lang := r.Header.Get("Accept-Language")
 	locales := appi18n.GetLocales(lang)
 
-	err := h.repos.ListsRepoImpl.CompleteActive(userID)
+	activeList, err := h.repos.ListsRepoImpl.GetActive(userID)
+	if err != nil {
+		h.app.Loggers.Error.Println(err.Error())
+		utils.Response(w, http.StatusInternalServerError, nil)
+		return
+	}
+
+	err = h.repos.ListsRepoImpl.CompleteActive(userID)
 	if err != nil {
 		h.app.Loggers.Error.Println(err.Error())
 		msg := locales.GetMsg("NoActiveList", nil)
@@ -404,6 +397,35 @@ func (h *Handler) CompleteActive(w http.ResponseWriter, r *http.Request) {
 		utils.Response(w, http.StatusNotFound, output)
 		return
 	}
+
+	//Updating tops information and sum quantity
+	var sum = 0
+	for i := 0; i < len(activeList.Items); i++ {
+		element := activeList.Items[i]
+		sum = sum + element.Quantity
+
+		err = h.repos.TopItemsImpl.Update(userID, element.ItemID, element.Quantity)
+		if err != nil {
+			h.app.Loggers.Error.Println(err.Error())
+		}
+		err = h.repos.TopCategoriesImpl.Update(userID, element.CategoryID)
+		if err != nil {
+			h.app.Loggers.Error.Println(err.Error())
+		}
+	}
+
+	itemsInfo := models.ItemsSummary{
+		Month:    int(activeList.Date.Month()),
+		Year:     activeList.Date.Year(),
+		Quantity: sum,
+	}
+	err = h.repos.ItemsSummaryRepoImpl.Add(userID, itemsInfo)
+	if err != nil {
+		h.app.Loggers.Error.Println(err.Error())
+		utils.Response(w, http.StatusInternalServerError, nil)
+		return
+	}
+
 	utils.Response(w, http.StatusOK, nil)
 }
 

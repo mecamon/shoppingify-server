@@ -9,12 +9,13 @@ import (
 var Main MainRepo
 
 type MainRepo struct {
-	AuthRepoImpl       AuthRepo
-	CategoriesRepoImpl CategoriesRepo
-	ItemsRepoIpml      ItemsRepo
-	ListsRepoImpl      ListsRepo
-	TopCategoriesImpl  TopCategoriesRepo
-	TopItemsImpl       TopItemsRepo
+	AuthRepoImpl         AuthRepo
+	CategoriesRepoImpl   CategoriesRepo
+	ItemsRepoIpml        ItemsRepo
+	ListsRepoImpl        ListsRepo
+	TopCategoriesImpl    TopCategoriesRepo
+	TopItemsImpl         TopItemsRepo
+	ItemsSummaryRepoImpl ItemsSummaryRepo
 }
 
 func InitRepos(conn *sql.DB, app *config.App) {
@@ -24,14 +25,16 @@ func InitRepos(conn *sql.DB, app *config.App) {
 	listsRepo := initListsRepo(conn, app)
 	topCategories := initTopCategoriesRepo(conn, app)
 	topItemsRepo := initTopItemsRepo(conn, app)
+	itemsSummaryRepo := initItemsSummaryRepoImpl(conn, app)
 
 	Main = MainRepo{
-		AuthRepoImpl:       authRepo,
-		CategoriesRepoImpl: categoriesRepo,
-		ItemsRepoIpml:      itemsRepo,
-		ListsRepoImpl:      listsRepo,
-		TopCategoriesImpl:  topCategories,
-		TopItemsImpl:       topItemsRepo,
+		AuthRepoImpl:         authRepo,
+		CategoriesRepoImpl:   categoriesRepo,
+		ItemsRepoIpml:        itemsRepo,
+		ListsRepoImpl:        listsRepo,
+		TopCategoriesImpl:    topCategories,
+		TopItemsImpl:         topItemsRepo,
+		ItemsSummaryRepoImpl: itemsSummaryRepo,
 	}
 }
 
@@ -83,7 +86,13 @@ type TopCategoriesRepo interface {
 
 type TopItemsRepo interface {
 	Add(userID, itemID int64) (int64, error)
-	Update(userID, itemID int64) error
+	Update(userID, itemID int64, quantity int) error
 	GetTop(userID int64, take int) ([]models.TopItemDTO, error)
 	GetAll(userID int64) ([]models.TopItemDTO, error)
+}
+
+type ItemsSummaryRepo interface {
+	Add(userID int64, itemsInfo models.ItemsSummary) error
+	GetMonthly(userID, year int64) (models.ItemsSummaryByMonthDTO, error)
+	GetYearly(userID int64) ([]models.ItemsSummaryByYearDTO, error)
 }

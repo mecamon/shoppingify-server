@@ -49,6 +49,10 @@ definitions:
       inserted_id:
         type: integer
     type: object
+  models.ErrorMap:
+    additionalProperties:
+      type: string
+    type: object
   models.ErrorMapDTO:
     properties:
       issue: {}
@@ -92,6 +96,31 @@ definitions:
   models.ItemSelIDDTO:
     properties:
       item_sel_id:
+        type: integer
+    type: object
+  models.ItemsSummaryByMonth:
+    properties:
+      id:
+        type: integer
+      month:
+        type: integer
+      quantity:
+        type: integer
+    type: object
+  models.ItemsSummaryByMonthDTO:
+    properties:
+      months:
+        items:
+          $ref: '#/definitions/models.ItemsSummaryByMonth'
+        type: array
+      year:
+        type: integer
+    type: object
+  models.ItemsSummaryByYearDTO:
+    properties:
+      quantity:
+        type: integer
+      year:
         type: integer
     type: object
   models.ListDTO:
@@ -736,7 +765,9 @@ paths:
         name: selectedItem
         required: true
         schema:
-          $ref: '#/definitions/models.UpdateSelItemDTO'
+          items:
+            $ref: '#/definitions/models.UpdateSelItemDTO'
+          type: array
       produces:
       - application/json
       responses:
@@ -751,6 +782,58 @@ paths:
       summary: Update item in active list
       tags:
       - lists
+  /api/summary:
+    get:
+      consumes:
+      - application/json
+      description: Get summary group by year
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ItemsSummaryByYearDTO'
+            type: array
+        "204":
+          description: ""
+        "400":
+          description: ""
+        "500":
+          description: ""
+      summary: Get summary group by year
+      tags:
+      - summary
+  /api/summary/{year}:
+    get:
+      consumes:
+      - application/json
+      description: Get summary group by month
+      parameters:
+      - description: year
+        in: path
+        name: year
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ItemsSummaryByMonthDTO'
+        "204":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorMap'
+        "500":
+          description: ""
+      summary: Get summary group by month
+      tags:
+      - summary
   /api/top-categories:
     get:
       consumes:

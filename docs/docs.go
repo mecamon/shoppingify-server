@@ -809,7 +809,10 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.UpdateSelItemDTO"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.UpdateSelItemDTO"
+                            }
                         }
                     }
                 ],
@@ -862,6 +865,85 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorMapDTO"
+                        }
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/summary": {
+            "get": {
+                "description": "Get summary group by year",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "summary"
+                ],
+                "summary": "Get summary group by year",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.ItemsSummaryByYearDTO"
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/summary/{year}": {
+            "get": {
+                "description": "Get summary group by month",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "summary"
+                ],
+                "summary": "Get summary group by month",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "year",
+                        "name": "year",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ItemsSummaryByMonthDTO"
+                        }
+                    },
+                    "204": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMap"
                         }
                     },
                     "500": {
@@ -1007,6 +1089,12 @@ const docTemplate = `{
                 }
             }
         },
+        "models.ErrorMap": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "string"
+            }
+        },
         "models.ErrorMapDTO": {
             "type": "object",
             "properties": {
@@ -1072,6 +1160,45 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "item_sel_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.ItemsSummaryByMonth": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "month": {
+                    "type": "integer"
+                },
+                "quantity": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.ItemsSummaryByMonthDTO": {
+            "type": "object",
+            "properties": {
+                "months": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ItemsSummaryByMonth"
+                    }
+                },
+                "year": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.ItemsSummaryByYearDTO": {
+            "type": "object",
+            "properties": {
+                "quantity": {
+                    "type": "integer"
+                },
+                "year": {
                     "type": "integer"
                 }
             }
