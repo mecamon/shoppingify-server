@@ -36,7 +36,7 @@ func (r *CategoriesRepoPostgres) RegisterCategory(cat models.Category) (int64, e
 func (r *CategoriesRepoPostgres) SearchCategoryByName(q string, skip, take int) ([]models.CategoryDTO, error) {
 	var categories []models.CategoryDTO
 
-	query := `SELECT id, name FROM categories AS c WHERE c.name LIKE $1 OFFSET $2 LIMIT $3`
+	query := `SELECT id, name FROM categories AS c WHERE c.name ILIKE $1 OFFSET $2 LIMIT $3`
 	stmt, _ := r.Conn.Prepare(query)
 	defer stmt.Close()
 
@@ -102,7 +102,7 @@ func (r *CategoriesRepoPostgres) GetAllWithItemName(q string, take, skip int) ([
 		AS c INNER JOIN items 
 		ON c.id=items.category_id 
 		WHERE items.name 
-	    LIKE $1 LIMIT $2 OFFSET $3
+	    ILIKE $1 LIMIT $2 OFFSET $3
 	    `
 	rows, err := r.Conn.QueryContext(ctx, query, "%"+q+"%", take, skip)
 	defer rows.Close()
