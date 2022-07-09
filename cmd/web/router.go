@@ -19,7 +19,7 @@ import (
 func makeRouter() http.Handler {
 	r := chi.NewRouter()
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"https://*", "http://*", "https://shoppingify-client-gilt.vercel.app/*"},
+		AllowedOrigins:   []string{"*"},
 		AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
 		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "Accept-Language", "X-CSRF-Token"},
