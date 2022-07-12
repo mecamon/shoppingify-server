@@ -144,6 +144,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 // @Failure      500
 // @Router       /api/auth/visitor-register [post]
 func (h *Handler) VisitorRegister(w http.ResponseWriter, r *http.Request) {
+	_ = r.Header.Get("Accept-Language")
 	visitor := createVisitorInformation()
 	id, err := h.repos.AuthRepoImpl.Register(visitor)
 	if err != nil {
