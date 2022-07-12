@@ -5,6 +5,7 @@ package repositories
 
 import (
 	"fmt"
+	"github.com/google/uuid"
 	fixtures_categoryies_repo "github.com/mecamon/shoppingify-server/__test__/fixtures/repos/categoryies-repo"
 	"github.com/mecamon/shoppingify-server/models"
 	"github.com/mecamon/shoppingify-server/utils"
@@ -52,7 +53,7 @@ func TestItemsRepoPostgres_SearchCategoryByName(t *testing.T) {
 	var skip = 0
 	var take = 6
 	q := "eat"
-	_, err := categoriesRepo.SearchCategoryByName(q, take, skip)
+	_, err := categoriesRepo.SearchCategoryByName(q, take, skip, userID)
 	if err != nil {
 		t.Error("error searching for categories: ", err.Error())
 	}
@@ -80,7 +81,7 @@ func TestCategoriesRepoPostgres_GetAll(t *testing.T) {
 		}
 	}
 
-	categories, err := categoriesRepo.GetAll(6, 0)
+	categories, err := categoriesRepo.GetAll(6, 0, userID)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -127,7 +128,7 @@ func TestCategoriesRepoPostgres_GetAllWithItemName(t *testing.T) {
 	}
 
 	// asserting data
-	categories, err := categoriesRepo.GetAllWithItemName("Item2", 8, 0)
+	categories, err := categoriesRepo.GetAllWithItemName("Item2", 8, 0, userID)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -139,7 +140,33 @@ func TestCategoriesRepoPostgres_GetAllWithItemName(t *testing.T) {
 }
 
 func TestCategoriesRepoPostgres_Count(t *testing.T) {
-	qty, err := categoriesRepo.Count()
+	userID, err := authRepo.Register(models.User{
+		Name:      "Count catrepo1",
+		Lastname:  "lastname",
+		Email:     "count@repocat.com",
+		Password:  "qioehqwiehqweqw",
+		IsActive:  true,
+		IsVisitor: false,
+		LoginCode: uuid.NewString(),
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
+	})
+	if err != nil {
+		t.Error(err.Error())
+	}
+
+	cat1 := models.Category{
+		Name:      "Cat for count 1",
+		UserID:    userID,
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
+	}
+	_, err = categoriesRepo.RegisterCategory(cat1)
+	if err != nil {
+		t.Error(err.Error())
+	}
+
+	qty, err := categoriesRepo.Count(userID)
 	if err != nil {
 		t.Error(err.Error())
 	}

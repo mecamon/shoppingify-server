@@ -46,10 +46,10 @@ type AuthRepo interface {
 
 type CategoriesRepo interface {
 	RegisterCategory(category models.Category) (int64, error)
-	SearchCategoryByName(q string, skip, take int) ([]models.CategoryDTO, error)
-	GetAll(take, skip int) ([]models.CategoryDTO, error)
-	GetAllWithItemName(q string, take, skip int) ([]models.CategoryDTO, error)
-	Count(filter ...string) (int64, error)
+	SearchCategoryByName(q string, skip, take int, userID int64) ([]models.CategoryDTO, error)
+	GetAll(take, skip int, userID int64) ([]models.CategoryDTO, error)
+	GetAllWithItemName(q string, take, skip int, userID int64) ([]models.CategoryDTO, error)
+	Count(userID int64, filter ...string) (int64, error)
 }
 
 type ItemsRepo interface {

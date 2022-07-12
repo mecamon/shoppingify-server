@@ -1,4 +1,5 @@
 app
+shoppingify-server
 .env
 coverage.out
 run.sh

@@ -33,14 +33,14 @@ func (r *CategoriesRepoPostgres) RegisterCategory(cat models.Category) (int64, e
 	return ID, nil
 }
 
-func (r *CategoriesRepoPostgres) SearchCategoryByName(q string, skip, take int) ([]models.CategoryDTO, error) {
+func (r *CategoriesRepoPostgres) SearchCategoryByName(q string, skip, take int, userID int64) ([]models.CategoryDTO, error) {
 	var categories []models.CategoryDTO
 
-	query := `SELECT id, name FROM categories AS c WHERE c.name ILIKE $1 OFFSET $2 LIMIT $3`
+	query := `SELECT id, name FROM categories AS c WHERE c.user_id=$4 AND c.name ILIKE $1 OFFSET $2 LIMIT $3`
 	stmt, _ := r.Conn.Prepare(query)
 	defer stmt.Close()
 
-	rows, err := stmt.Query("%"+q+"%", skip, take)
+	rows, err := stmt.Query("%"+q+"%", skip, take, userID)
 	defer rows.Close()
 	if err != nil {
 		return nil, err
@@ -61,14 +61,14 @@ func (r *CategoriesRepoPostgres) SearchCategoryByName(q string, skip, take int) 
 	return categories, nil
 }
 
-func (r *CategoriesRepoPostgres) GetAll(take, skip int) ([]models.CategoryDTO, error) {
+func (r *CategoriesRepoPostgres) GetAll(take, skip int, userID int64) ([]models.CategoryDTO, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
 	var categories []models.CategoryDTO
 
-	query := `SELECT id, name from categories ORDER BY name DESC LIMIT $1 OFFSET $2`
-	rows, err := r.Conn.QueryContext(ctx, query, take, skip)
+	query := `SELECT id, name from categories WHERE user_id = $3 ORDER BY name DESC LIMIT $1 OFFSET $2`
+	rows, err := r.Conn.QueryContext(ctx, query, take, skip, userID)
 	defer rows.Close()
 	if err != nil {
 		return categories, err
@@ -90,7 +90,7 @@ func (r *CategoriesRepoPostgres) GetAll(take, skip int) ([]models.CategoryDTO, e
 	return categories, nil
 }
 
-func (r *CategoriesRepoPostgres) GetAllWithItemName(q string, take, skip int) ([]models.CategoryDTO, error) {
+func (r *CategoriesRepoPostgres) GetAllWithItemName(q string, take, skip int, userID int64) ([]models.CategoryDTO, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -101,10 +101,10 @@ func (r *CategoriesRepoPostgres) GetAllWithItemName(q string, take, skip int) ([
 		FROM categories 
 		AS c INNER JOIN items 
 		ON c.id=items.category_id 
-		WHERE items.name 
+		WHERE c.user_id=$4 AND items.name 
 	    ILIKE $1 LIMIT $2 OFFSET $3
 	    `
-	rows, err := r.Conn.QueryContext(ctx, query, "%"+q+"%", take, skip)
+	rows, err := r.Conn.QueryContext(ctx, query, "%"+q+"%", take, skip, userID)
 	defer rows.Close()
 	if err != nil {
 		return categories, err
@@ -125,7 +125,7 @@ func (r *CategoriesRepoPostgres) GetAllWithItemName(q string, take, skip int) ([
 	return categories, nil
 }
 
-func (r *CategoriesRepoPostgres) Count(filter ...string) (int64, error) {
+func (r *CategoriesRepoPostgres) Count(userID int64, filter ...string) (int64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -133,14 +133,14 @@ func (r *CategoriesRepoPostgres) Count(filter ...string) (int64, error) {
 	var query string
 
 	if len(filter) == 0 {
-		query = `SELECT COUNT(*) FROM categories`
-		err := r.Conn.QueryRowContext(ctx, query).Scan(&count)
+		query = `SELECT COUNT(*) FROM categories WHERE user_id=$1`
+		err := r.Conn.QueryRowContext(ctx, query, userID).Scan(&count)
 		if err != nil {
 			return 0, err
 		}
 	} else {
-		query = `SELECT COUNT(*) FROM categories AS c WHERE c.name LIKE $1`
-		err := r.Conn.QueryRowContext(ctx, query, "%"+filter[0]+"%").Scan(&count)
+		query = `SELECT COUNT(*) FROM categories AS c WHERE c.name LIKE $1 AND c.user_id=$2`
+		err := r.Conn.QueryRowContext(ctx, query, "%"+filter[0]+"%", userID).Scan(&count)
 		if err != nil {
 			return 0, err
 		}

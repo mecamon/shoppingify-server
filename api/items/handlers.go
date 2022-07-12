@@ -130,6 +130,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 // @Failure      500
 // @Router       /api/items [get]
 func (h *Handler) GetByCategoryGroups(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value("ID").(int64)
 	q := r.URL.Query().Get("q")
 
 	takeQuery := r.URL.Query().Get("take")
@@ -144,11 +145,11 @@ func (h *Handler) GetByCategoryGroups(w http.ResponseWriter, r *http.Request) {
 	var count int64
 
 	if q != "" {
-		categories, err = h.repos.CategoriesRepoImpl.GetAllWithItemName(q, take, skip)
-		count, err = h.repos.CategoriesRepoImpl.Count(q)
+		categories, err = h.repos.CategoriesRepoImpl.GetAllWithItemName(q, take, skip, userID)
+		count, err = h.repos.CategoriesRepoImpl.Count(userID, q)
 	} else {
-		categories, err = h.repos.CategoriesRepoImpl.GetAll(take, skip)
-		count, err = h.repos.CategoriesRepoImpl.Count(q)
+		categories, err = h.repos.CategoriesRepoImpl.GetAll(take, skip, userID)
+		count, err = h.repos.CategoriesRepoImpl.Count(userID, q)
 	}
 	if err != nil {
 		h.app.Loggers.Error.Println(err.Error())

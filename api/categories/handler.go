@@ -97,6 +97,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 // @Failure      500
 // @Router       /api/categories/by-name [get]
 func (h *Handler) GetAllByName(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value("ID").(int64)
 	q := r.URL.Query().Get("q")
 
 	takeQuery := r.URL.Query().Get("take")
@@ -105,12 +106,12 @@ func (h *Handler) GetAllByName(w http.ResponseWriter, r *http.Request) {
 	skipQuery := r.URL.Query().Get("skip")
 	skip, _ := utils.QueryConvertInt(skipQuery, 0)
 
-	categories, err := h.Repos.CategoriesRepoImpl.SearchCategoryByName(q, skip, take)
+	categories, err := h.Repos.CategoriesRepoImpl.SearchCategoryByName(q, skip, take, userID)
 	if err != nil {
 		h.App.Loggers.Error.Println(err.Error())
 		panic(w)
 	}
-	count, err := h.Repos.CategoriesRepoImpl.Count(q)
+	count, err := h.Repos.CategoriesRepoImpl.Count(userID, q)
 	if err != nil {
 		h.App.Loggers.Error.Println(err.Error())
 	}
@@ -136,18 +137,20 @@ func (h *Handler) GetAllByName(w http.ResponseWriter, r *http.Request) {
 // @Failure      500
 // @Router       /api/categories [get]
 func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value("ID").(int64)
+
 	takeQuery := r.URL.Query().Get("take")
 	take, _ := utils.QueryConvertInt(takeQuery, 12)
 
 	skipQuery := r.URL.Query().Get("skip")
 	skip, _ := utils.QueryConvertInt(skipQuery, 0)
 
-	categories, err := h.Repos.CategoriesRepoImpl.GetAll(take, skip)
+	categories, err := h.Repos.CategoriesRepoImpl.GetAll(take, skip, userID)
 	if err != nil {
 		h.App.Loggers.Error.Println(err.Error())
 		panic(w)
 	}
-	count, err := h.Repos.CategoriesRepoImpl.Count()
+	count, err := h.Repos.CategoriesRepoImpl.Count(userID)
 	if err != nil {
 		h.App.Loggers.Error.Println(err.Error())
 	}
